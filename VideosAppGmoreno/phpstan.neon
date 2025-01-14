@@ -1,0 +1,8 @@
+includes:
+    - vendor/nunomaduro/larastan/extension.neon
+    - vendor/nesbot/carbon/extension.neon
+
+parameters:
+    level: max
+    paths:
+        - app

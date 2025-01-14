@@ -1,10 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\VideosController;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/video/{id}', [VideosController::class, 'index'])->name('videos.index');
 
 Route::middleware([
     'auth:sanctum',

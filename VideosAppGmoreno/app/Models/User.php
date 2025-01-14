@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -11,10 +12,15 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @use HasFactory<UserFactory>
+ */
 class User extends Authenticatable
 {
+    /** @var string */
+    protected static string $factory = UserFactory::class;
+
     use HasApiTokens;
-    use HasFactory;
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
@@ -22,19 +28,19 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
-        'current_team_id', // Añadido si deseas permitir asignaciones masivas
+        'current_team_id',
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $hidden = [
         'password',
@@ -46,7 +52,7 @@ class User extends Authenticatable
     /**
      * The accessors to append to the model's array form.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $appends = [
         'profile_photo_url',
@@ -55,18 +61,17 @@ class User extends Authenticatable
     /**
      * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 
     /**
      * Relationship: Current Team.
+     *
+     * @return BelongsTo<Team, User>
      */
     public function currentTeam(): BelongsTo
     {
@@ -74,10 +79,15 @@ class User extends Authenticatable
     }
 
     /**
-     * Relationship: Teams owned by the user.
+     * Relationship: Owned Teams.
+     *
+     * @return HasMany<Team, User>
      */
     public function ownedTeams(): HasMany
     {
-        return $this->hasMany(Team::class, 'user_id');
+        /** @var HasMany<Team, User> $relation */
+        $relation = $this->hasMany(Team::class, 'user_id');
+        return $relation;
     }
 }
+

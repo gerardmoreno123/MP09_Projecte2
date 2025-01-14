@@ -13,8 +13,14 @@ class Team extends Model
         'personal_team',
     ];
 
+    /**
+     * Define la relación con el modelo User
+     *
+     * @return BelongsTo<User, Team>
+     */
     public function owner(): BelongsTo
     {
+        /** @var BelongsTo<User, Team> */
         return $this->belongsTo(User::class, 'user_id');
     }
 }
