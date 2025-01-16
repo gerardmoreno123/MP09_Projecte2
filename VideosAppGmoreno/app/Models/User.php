@@ -12,14 +12,10 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/**
- * @use HasFactory<UserFactory>
- */
 class User extends Authenticatable
 {
-    /** @var string */
-    protected static string $factory = UserFactory::class;
-
+    /** @use HasFactory<UserFactory> */
+    use HasFactory;
     use HasApiTokens;
     use HasProfilePhoto;
     use Notifiable;
@@ -69,8 +65,6 @@ class User extends Authenticatable
     ];
 
     /**
-     * Relationship: Current Team.
-     *
      * @return BelongsTo<Team, User>
      */
     public function currentTeam(): BelongsTo

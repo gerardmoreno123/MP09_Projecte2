@@ -8,6 +8,7 @@ use App\Models\Video;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Carbon\Carbon;
+use App\Helpers\VideoHelper;
 
 class HelpersTest extends TestCase
 {
@@ -37,14 +38,39 @@ class HelpersTest extends TestCase
         $this->assertEquals($teacher->current_team_id, $teacher->currentTeam->id);
     }
 
-    public function test_create_default_video()
+    public function test_getFormattedPublishedAtAttribute()
     {
-        $video = create_default_video();
+        // Crea un video utilizando el factory
+        $video = Video::factory()->create([
+            'published_at' => Carbon::now()->subDays(3),
+        ]);
 
-        $this->assertInstanceOf(Video::class, $video);
-        $this->assertEquals('Titol perdefecte', $video->title);
-        $this->assertEquals('Descripció perdefecte', $video->description);
-        $this->assertEquals('https://www.youtube.com/watch?v=123456', $video->url);
-        $this->assertEquals(Carbon::now()->toDateString(), $video->published_at->toDateString());
+        $formattedDate = VideoHelper::getFormattedPublishedAtAttribute($video->published_at);
+
+        $this->assertEquals(Carbon::now()->subDays(3)->isoFormat('D [de] MMMM [de] YYYY'), $formattedDate);
+    }
+
+    public function test_getFormattedForHumansPublishedAtAttribute()
+    {
+        // Crea un video utilizando el factory
+        $video = Video::factory()->create([
+            'published_at' => Carbon::now()->subDays(3),
+        ]);
+
+        $formattedForHumans = VideoHelper::getFormattedForHumansPublishedAtAttribute($video->published_at);
+
+        $this->assertEquals(Carbon::now()->subDays(3)->diffForHumans(), $formattedForHumans);
+    }
+
+    public function test_getPublishedAtTimestampAttribute()
+    {
+        // Crea un video utilizando el factory
+        $video = Video::factory()->create([
+            'published_at' => Carbon::now()->subDays(3),
+        ]);
+
+        $timestamp = VideoHelper::getPublishedAtTimestampAttribute($video->published_at);
+
+        $this->assertEquals(Carbon::now()->subDays(3)->timestamp, $timestamp);
     }
 }

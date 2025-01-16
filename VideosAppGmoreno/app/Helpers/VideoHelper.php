@@ -1,6 +1,7 @@
 <?php
 
-use App\Models\Video;
+namespace App\Helpers;
+
 use Carbon\Carbon;
 
 class VideoHelper
@@ -11,11 +12,10 @@ class VideoHelper
      * @param string $date El video del que volem obtenir la data de publicació
      * @return string
      */
-    public static function getFormattedPublishedAtAttribute($date)
+    public static function getFormattedPublishedAtAttribute(string $date): string
     {
         return Carbon::parse($date)->isoFormat('D [de] MMMM [de] YYYY');
     }
-
 
     /**
      * Torna la data de publicació en format "fa 3 dies"
@@ -23,21 +23,20 @@ class VideoHelper
      * @param string $date El video del que volem obtenir la data de publicació
      * @return string
      */
-    public static function getFormattedForHumansPublishedAtAttribute($date)
+    public static function getFormattedForHumansPublishedAtAttribute(string $date): string
     {
         return Carbon::parse($date)->diffForHumans();
     }
 
     /**
-     * Torna la data de publicació en format unix timestamp
+     * Torna la data de publicació en format timestamp
      *
      * @param string $date El video del que volem obtenir la data de publicació
      * @return int
      */
-    public static function getPublishedAtTimestampAttribute($date)
+    public static function getPublishedAtTimestampAttribute(string $date): int
     {
-        $timestamp = Carbon::parse($date)->timestamp;
-
-        return (int) $timestamp;
+        return (int) Carbon::parse($date)->timestamp;
     }
 }
+

@@ -1,5 +1,4 @@
 <?php
-// tests/Feature/VideosTest.php
 
 namespace Tests\Feature\Videos;
 
@@ -12,7 +11,7 @@ class VideosTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function users_can_view_videos()
+    public function test_users_can_view_videos()
     {
         $user = User::factory()->create();
         $video = Video::factory()->create();
@@ -23,7 +22,7 @@ class VideosTest extends TestCase
         $response->assertSee($video->title);
     }
 
-    public function users_cannot_view_not_existing_videos()
+    public function test_users_cannot_view_not_existing_videos()
     {
         $user = User::factory()->create();
 

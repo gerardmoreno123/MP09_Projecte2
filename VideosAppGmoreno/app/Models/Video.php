@@ -6,15 +6,13 @@ use Database\Factories\VideoFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
-use App\Models\Series;
+use App\Models\Series; #No existeix encara
+use App\Helpers\VideoHelper;
 
-/**
- * @use HasFactory<VideoFactory>
- */
 class Video extends Model
 {
-    /** @var string */
-    protected static string $factory = VideoFactory::class;
+    /** @use HasFactory<VideoFactory> */
+    use HasFactory;
 
     protected $fillable = [
         'title',
@@ -37,7 +35,7 @@ class Video extends Model
      */
     public function getFormattedPublishedAtAttribute(): string
     {
-        return \VideoHelper::getFormattedPublishedAtAttribute($this->published_at);
+        return VideoHelper::getFormattedPublishedAtAttribute($this->published_at);
     }
 
     /**
@@ -47,7 +45,7 @@ class Video extends Model
      */
     public function getFormattedForHumansPublishedAtAttribute(): string
     {
-        return \VideoHelper::getFormattedForHumansPublishedAtAttribute($this->published_at);
+        return VideoHelper::getFormattedForHumansPublishedAtAttribute($this->published_at);
     }
 
     /**
@@ -57,6 +55,6 @@ class Video extends Model
      */
     public function getPublishedAtTimestampAttribute(): int
     {
-        return \VideoHelper::getPublishedAtTimestampAttribute($this->published_at);
+        return VideoHelper::getPublishedAtTimestampAttribute($this->published_at);
     }
 }

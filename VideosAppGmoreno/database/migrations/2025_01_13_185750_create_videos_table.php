@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamp('published_at');
             $table->foreignId('previous_id')->nullable()->constrained('videos');
             $table->foreignId('next_id')->nullable()->constrained('videos');
-            $table->foreignId('series_id')->constrained('series');;
+            $table->foreignId('series_id')->nullable()->constrained('series');
             $table->timestamps();
         });
 

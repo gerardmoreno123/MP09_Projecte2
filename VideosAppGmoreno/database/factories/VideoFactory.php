@@ -2,28 +2,24 @@
 
 namespace Database\Factories;
 
+use App\Models\Video;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Carbon\Carbon;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Video>
- */
 class VideoFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Video::class;
+
     public function definition(): array
     {
         return [
-            'title' => $this->faker->sentence(),
-            'description' => $this->faker->paragraph(),
-            'url' => $this->faker->url(),
-            'published_at' => $this->faker->dateTimeThisDecade(),
-            'previous_id' => null,
-            'next_id' => null,
-            'series_id' => null,
+            'title' => $this->faker->sentence,
+            'description' => $this->faker->paragraph,
+            'url' => $this->faker->url,
+            'published_at' => Carbon::now()->subDays(rand(1, 10)),
+            'previous_id' => $this->faker->sentence,
+            'next_id' => $this->faker->sentence,
+            'series_id' => $this->faker->randomDigitNotNull,
         ];
     }
 }
