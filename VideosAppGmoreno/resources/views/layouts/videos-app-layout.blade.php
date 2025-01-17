@@ -1,32 +1,34 @@
-<!-- resources/views/layouts/videos-app-layout.blade.php -->
-
 <!DOCTYPE html>
 <html lang="ca">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>VídeosApp Gmoreno</title>
-        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    </head>
-    <body>
-        <header>
-            <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                <div class="container">
-                    <a class="navbar-brand" href="{{ route('videos.show', ['id' => $video->id]) }}">VídeosApp</a>
-                </div>
-            </nav>
-        </header>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VídeosApp Gmoreno</title>
+    <script src="{{ asset('js/app.js') }}"></script>
+    @vite('resources/css/app.css')
+</head>
+<body class="bg-gray-100 flex flex-col min-h-screen">
 
-        <main>
-            <div class="container mt-4">
-                @yield('content')
-            </div>
-        </main>
+<!-- Cabecera -->
+<header class="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-4">
+    <nav class="navbar navbar-expand-lg navbar-light container">
+        <a class="mx-5 navbar-brand text-3xl font-semibold" href="{{ route('videos.show', ['id' => rand(1,3)]) }}"> Video Random</a>
+    </nav>
+</header>
 
-        <footer class="bg-light text-center text-lg-start mt-4">
-            <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2)">
-                &copy; 2021 <a class="text-dark" href="https://github.com/gerardmoreno123" target="_blank">Gmoreno</a>
-            </div>
-        </footer>
-    </body>
+<!-- Contenido principal -->
+<main class="flex-grow bg-gray-200">
+    <div class="container mx-auto px-4 md:px-6 py-8">
+        @yield('content')
+    </div>
+</main>
+
+<!-- Pie de página -->
+<footer class="bg-gray-800 text-center text-white py-4">
+    <div class="text-center p-3">
+        &copy; 2025 <a class="text-blue-400" href="https://github.com/gerardmoreno123" target="_blank">Gmoreno</a>
+    </div>
+</footer>
+
+</body>
 </html>

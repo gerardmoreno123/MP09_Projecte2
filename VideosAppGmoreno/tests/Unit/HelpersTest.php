@@ -55,7 +55,7 @@ class HelpersTest extends TestCase
         $video1 = $videos[0];
         $this->assertEquals('Video 1', $video1->title);
         $this->assertEquals('Descripció del video 1', $video1->description);
-        $this->assertEquals('https://www.youtube.com/watch?v=video1', $video1->url);
+        $this->assertEquals('https://www.youtube.com/embed/VRvmn2WA0Q8?si=ih-tb-l0SKeoFl1p', $video1->url);
         $this->assertEquals(null, $video1->previous_id);
         $this->assertEquals(2, $video1->next_id);
 

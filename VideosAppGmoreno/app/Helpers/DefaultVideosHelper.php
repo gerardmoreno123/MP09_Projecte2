@@ -24,7 +24,7 @@ class DefaultVideosHelper
         $video1 = Video::create([
             'title' => 'Video 1',
             'description' => 'Descripció del video 1',
-            'url' => 'https://www.youtube.com/watch?v=video1',
+            'url' => 'https://www.youtube.com/embed/VRvmn2WA0Q8?si=ih-tb-l0SKeoFl1p',
             'published_at' => '2025-01-13 12:00:00',
             'previous_id' => null,
             'next_id' => null,
@@ -34,7 +34,7 @@ class DefaultVideosHelper
         $video2 = Video::create([
             'title' => 'Video 2',
             'description' => 'Descripció del video 2',
-            'url' => 'https://www.youtube.com/watch?v=video2',
+            'url' => 'https://www.youtube.com/embed/CYXJYQZ3FX0?si=i8LCxbQFYv-NG6jh',
             'published_at' => '2025-01-10 12:00:00',
             'previous_id' => null,
             'next_id' => null,
@@ -44,7 +44,7 @@ class DefaultVideosHelper
         $video3 = Video::create([
             'title' => 'Video 3',
             'description' => 'Descripció del video 3',
-            'url' => 'https://www.youtube.com/watch?v=video3',
+            'url' => 'https://www.youtube.com/embed/VjlqaPc98hg?si=kgjsVBjIut-4H5T- ',
             'published_at' => '2025-01-07 12:00:00',
             'previous_id' => null,
             'next_id' => null,

@@ -28,6 +28,36 @@ class VideosTest extends TestCase
         $this->assertEquals($expectedDate, $formattedDate);
     }
 
+    public function test_can_get_formatted_for_humans_published_at_date()
+    {
+        $video = Video::create([
+            'title' => 'Video de prueba',
+            'description' => 'Descripción de prueba',
+            'url' => 'http://test.com',
+            'published_at' => Carbon::now()->subDays(3)->toDateString(),
+//            'series_id' => null,
+        ]);
+
+        $formattedDate = $video->getFormattedForHumansPublishedAtAttribute();
+
+        $this->assertEquals('fa 3 dies', $formattedDate);
+    }
+
+    public function test_can_get_published_at_timestamp()
+    {
+        $video = Video::create([
+            'title' => 'Video de prueba',
+            'description' => 'Descripción de prueba',
+            'url' => 'http://test.com',
+            'published_at' => Carbon::now()->toDateString(),
+//            'series_id' => null,
+        ]);
+
+        $timestamp = $video->getPublishedAtTimestampAttribute();
+
+        $this->assertEquals($video->published_at->timestamp, $timestamp);
+    }
+
     public function test_can_get_formatted_published_at_date_when_not_published()
     {
         $video = Video::create([
@@ -42,4 +72,5 @@ class VideosTest extends TestCase
 
         $this->assertEquals(null, $formattedDate);
     }
+
 }
