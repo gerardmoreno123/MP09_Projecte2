@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Videos;
 
+use App\Helpers\DefaultVideosHelper;
+use App\Helpers\UserHelpers;
 use App\Models\User;
 use App\Models\Video;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,18 +15,21 @@ class VideosTest extends TestCase
 
     public function test_users_can_view_videos()
     {
-        $user = User::factory()->create();
-        $video = Video::factory()->create();
+        $user = (new UserHelpers())->create_default_user();
+        $videos = (new DefaultVideosHelper())->create_default_videos();
 
-        $response = $this->actingAs($user)->get("/videos/{$video->id}");
+        $video = $videos[1];
+
+        $response = $this->actingAs($user)->get("/video/{$video->id}");
 
         $response->assertStatus(200);
         $response->assertSee($video->title);
     }
 
+
     public function test_users_cannot_view_not_existing_videos()
     {
-        $user = User::factory()->create();
+        $user = (new UserHelpers())->create_default_user();
 
         $response = $this->actingAs($user)->get('/videos/9999');
 

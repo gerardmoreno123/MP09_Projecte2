@@ -12,7 +12,7 @@
         <header>
             <nav class="navbar navbar-expand-lg navbar-light bg-light">
                 <div class="container">
-                    <a class="navbar-brand" href="{{ route('videos.index') }}">VídeosApp</a>
+                    <a class="navbar-brand" href="{{ route('videos.show', ['id' => $video->id]) }}">VídeosApp</a>
                 </div>
             </nav>
         </header>

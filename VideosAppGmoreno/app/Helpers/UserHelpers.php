@@ -1,20 +1,25 @@
 <?php
 
+namespace App\Helpers;
+
 use App\Models\User;
 use App\Models\Team;
 use Illuminate\Support\Facades\Hash;
+use InvalidArgumentException;
 
-if (!function_exists('create_default_user')) {
-    /**
-     * Crea un usuari per defecte.
-     *
-     * @return User
-     */
-    function create_default_user(): User
+class UserHelpers
+{
+    public static function create_default_user(): User
     {
         $password = config('userdefaults.default_user.password');
         if (!is_string($password)) {
             throw new InvalidArgumentException('El valor de la contraseña debe ser una cadena.');
+        }
+
+        $existingUser = User::where('email', config('userdefaults.default_user.email'))->first();
+
+        if ($existingUser) {
+            return $existingUser;
         }
 
         $user = User::create([
@@ -34,19 +39,18 @@ if (!function_exists('create_default_user')) {
 
         return $user;
     }
-}
 
-if (!function_exists('create_default_teacher')) {
-    /**
-     * Crea un professor per defecte.
-     *
-     * @return User
-     */
-    function create_default_teacher(): User
+    public static function create_default_teacher(): User
     {
         $password = config('userdefaults.default_teacher.password');
         if (!is_string($password)) {
             throw new InvalidArgumentException('El valor de la contraseña debe ser una cadena.');
+        }
+
+        $existingTeacher = User::where('email', config('userdefaults.default_teacher.email'))->first();
+
+        if ($existingTeacher) {
+            return $existingTeacher;
         }
 
         $teacher = User::create([

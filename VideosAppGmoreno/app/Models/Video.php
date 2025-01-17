@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Database\Factories\VideoFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 use App\Models\Series; #No existeix encara
 use App\Helpers\VideoHelper;
 
@@ -29,29 +29,30 @@ class Video extends Model
     ];
 
     /**
-     * Formato de la fecha de publicación
+     * Format de la data de publicació
      *
-     * @return string
+     * @return string|null
      */
-    public function getFormattedPublishedAtAttribute(): string
+    public function getFormattedPublishedAtAttribute(): string|null
     {
         return VideoHelper::getFormattedPublishedAtAttribute($this->published_at);
     }
 
     /**
-     * Fecha de publicación en formato legible para el humano
+     * Data de publicació en format humà
      *
-     * @return string
+     * @return string|null
      */
-    public function getFormattedForHumansPublishedAtAttribute(): string
+    public function getFormattedForHumansPublishedAtAttribute(): string|null
     {
         return VideoHelper::getFormattedForHumansPublishedAtAttribute($this->published_at);
     }
 
     /**
-     * Fecha de publicación como un timestamp
+     * Data de publicació en format UNIX timestamp
      *
      * @return int
+     *
      */
     public function getPublishedAtTimestampAttribute(): int
     {

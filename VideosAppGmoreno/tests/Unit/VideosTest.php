@@ -18,12 +18,14 @@ class VideosTest extends TestCase
             'description' => 'Descripción de prueba',
             'url' => 'http://test.com',
             'published_at' => Carbon::now()->toDateString(),
-            'series_id' => null,
+//            'series_id' => null,
         ]);
 
         $formattedDate = $video->getFormattedPublishedAtAttribute();
 
-        $this->assertEquals('13 de gener de 2025', $formattedDate);
+        $expectedDate = Carbon::now()->locale('ca')->isoFormat('D [de] MMMM [de] YYYY');
+
+        $this->assertEquals($expectedDate, $formattedDate);
     }
 
     public function test_can_get_formatted_published_at_date_when_not_published()
@@ -33,11 +35,11 @@ class VideosTest extends TestCase
             'description' => 'Este video no ha sido publicado aún',
             'url' => 'http://test.com',
             'published_at' => null,
-            'series_id' => null,
+//            'series_id' => null,
         ]);
 
         $formattedDate = $video->getFormattedPublishedAtAttribute();
 
-        $this->assertNull($formattedDate);
+        $this->assertEquals(null, $formattedDate);
     }
 }

@@ -7,7 +7,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/video/{id}', [VideosController::class, 'index'])->name('videos.index');
+Route::get('/video/{id}', [VideosController::class, 'show'])->name('videos.show');
 
 Route::middleware([
     'auth:sanctum',

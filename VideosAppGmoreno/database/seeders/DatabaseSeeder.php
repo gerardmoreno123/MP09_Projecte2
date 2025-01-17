@@ -2,11 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Video;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Database\Factories\VideoFactory;
 use Illuminate\Database\Seeder;
+use App\Helpers\UserHelpers;
+use App\Helpers\DefaultVideosHelper;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,7 +13,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(10)->create();
-        Video::Factory(10)->create();
+        $userHelpers = new UserHelpers();
+        $defaultUser = $userHelpers->create_default_user();
+        $this->command->info("Usuario por defecto creado: {$defaultUser->email}");
+
+        $defaultTeacher = $userHelpers->create_default_teacher();
+        $this->command->info("Profesor por defecto creado: {$defaultTeacher->email}");
+
+        $defaultVideos = DefaultVideosHelper::create_default_videos();
+        $this->command->info("Videos creados: " . $defaultVideos->pluck('title')->join(', '));
     }
 }

@@ -10,7 +10,7 @@ use App\Models\Video;
 class VideosController extends Controller
 {
     /**
-     * Muestra un video por su ID.
+     * Mostra un video per la seva ID.
      *
      * @param int $id
      * @return View|JsonResponse
@@ -27,7 +27,7 @@ class VideosController extends Controller
     }
 
     /**
-     * Devuelve los testers asociados a un video.
+     * Retorna els testers d'un video.
      *
      * @param int $id
      * @return JsonResponse

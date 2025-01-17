@@ -7,8 +7,8 @@ use App\Models\User;
 use App\Models\Video;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Carbon\Carbon;
-use App\Helpers\VideoHelper;
+use App\Helpers\DefaultVideosHelper;
+use App\Helpers\UserHelpers;
 
 class HelpersTest extends TestCase
 {
@@ -16,7 +16,7 @@ class HelpersTest extends TestCase
 
     public function test_create_default_user()
     {
-        $user = create_default_user();
+        $user = (new UserHelpers())->create_default_user();
 
         $this->assertInstanceOf(User::class, $user);
         $this->assertEquals(config('userdefaults.default_user.name'), $user->name);
@@ -28,7 +28,7 @@ class HelpersTest extends TestCase
 
     public function test_create_default_teacher()
     {
-        $teacher = create_default_teacher();
+        $teacher = (new UserHelpers())->create_default_teacher();
 
         $this->assertInstanceOf(User::class, $teacher);
         $this->assertEquals(config('userdefaults.default_teacher.name'), $teacher->name);
@@ -38,39 +38,42 @@ class HelpersTest extends TestCase
         $this->assertEquals($teacher->current_team_id, $teacher->currentTeam->id);
     }
 
-    public function test_getFormattedPublishedAtAttribute()
+    public function test_create_default_videos()
     {
-        // Crea un video utilizando el factory
-        $video = Video::factory()->create([
-            'published_at' => Carbon::now()->subDays(3),
-        ]);
+        // Llama a la función helper
+        $videos = (new DefaultVideosHelper())->create_default_videos();
 
-        $formattedDate = VideoHelper::getFormattedPublishedAtAttribute($video->published_at);
+        // Verifica que se han creado tres instancias de Video
+        $this->assertCount(3, $videos);
 
-        $this->assertEquals(Carbon::now()->subDays(3)->isoFormat('D [de] MMMM [de] YYYY'), $formattedDate);
-    }
+        // Verifica que cada instancia es del tipo Video
+        foreach ($videos as $video) {
+            $this->assertInstanceOf(Video::class, $video);
+        }
 
-    public function test_getFormattedForHumansPublishedAtAttribute()
-    {
-        // Crea un video utilizando el factory
-        $video = Video::factory()->create([
-            'published_at' => Carbon::now()->subDays(3),
-        ]);
+        // Verifica que las propiedades del primer video sean correctas
+        $video1 = $videos[0];
+        $this->assertEquals('Video 1', $video1->title);
+        $this->assertEquals('Descripció del video 1', $video1->description);
+        $this->assertEquals('https://www.youtube.com/watch?v=video1', $video1->url);
+        $this->assertEquals(null, $video1->previous_id);
+        $this->assertEquals(2, $video1->next_id);
 
-        $formattedForHumans = VideoHelper::getFormattedForHumansPublishedAtAttribute($video->published_at);
+        // Verifica las propiedades del segundo video
+        $video2 = $videos[1];
+        $this->assertEquals('Video 2', $video2->title);
+        $this->assertEquals(1, $video2->previous_id);
+        $this->assertEquals(3, $video2->next_id);
 
-        $this->assertEquals(Carbon::now()->subDays(3)->diffForHumans(), $formattedForHumans);
-    }
+        // Verifica las propiedades del tercer video
+        $video3 = $videos[2];
+        $this->assertEquals('Video 3', $video3->title);
+        $this->assertEquals(2, $video3->previous_id);
+        $this->assertEquals(null, $video3->next_id);
 
-    public function test_getPublishedAtTimestampAttribute()
-    {
-        // Crea un video utilizando el factory
-        $video = Video::factory()->create([
-            'published_at' => Carbon::now()->subDays(3),
-        ]);
-
-        $timestamp = VideoHelper::getPublishedAtTimestampAttribute($video->published_at);
-
-        $this->assertEquals(Carbon::now()->subDays(3)->timestamp, $timestamp);
+        // Verifica que los videos existen en la base de datos
+        $this->assertDatabaseHas('videos', ['title' => 'Video 1']);
+        $this->assertDatabaseHas('videos', ['title' => 'Video 2']);
+        $this->assertDatabaseHas('videos', ['title' => 'Video 3']);
     }
 }
