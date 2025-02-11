@@ -12,6 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Permission\Traits\HasRoles;
+use Tests\Unit\UserTest;
 
 class User extends Authenticatable
 {
@@ -88,7 +89,13 @@ class User extends Authenticatable
 
     public function testedBy()
     {
-        return $this->name;
+        $tests = [];
+
+        if (class_exists(UserTest::class)) {
+            $tests[] = UserTest::class;
+        }
+
+        return !empty($tests) ? implode('<br>', $tests) : 'Desconegut';
     }
 
     public function isSuperAdmin()

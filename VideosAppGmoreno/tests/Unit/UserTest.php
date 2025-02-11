@@ -11,6 +11,8 @@ class UserTest extends TestCase
 {
     use RefreshDatabase;
 
+    public const TESTED_BY = self::class;
+
     protected function setUp(): void
     {
         parent::setUp();
