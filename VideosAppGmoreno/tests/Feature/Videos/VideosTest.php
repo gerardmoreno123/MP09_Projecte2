@@ -13,6 +13,8 @@ class VideosTest extends TestCase
 {
     use RefreshDatabase;
 
+    public const TESTED_BY = self::class;
+
     public function test_users_can_view_videos()
     {
         $user = (new UserHelpers())->create_default_user();

@@ -4,8 +4,11 @@ namespace App\Helpers;
 
 use App\Models\User;
 use App\Models\Team;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use InvalidArgumentException;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class UserHelpers
 {
@@ -28,14 +31,7 @@ class UserHelpers
             'password' => Hash::make($password),
         ]);
 
-        $team = Team::forceCreate([
-            'user_id' => $user->id,
-            'team_name' => explode(' ', $user->name, 2)[0] . "'s Team",
-            'personal_team' => true,
-        ]);
-
-        $user->current_team_id = $team->id;
-        $user->save();
+        self::add_personal_team($user);
 
         return $user;
     }
@@ -57,17 +53,62 @@ class UserHelpers
             'name' => config('userdefaults.default_teacher.name'),
             'email' => config('userdefaults.default_teacher.email'),
             'password' => Hash::make($password),
+            'super_admin' => true,
         ]);
 
+        self::add_personal_team($teacher);
+
+        return $teacher;
+    }
+
+    public static function add_personal_team(User $user)
+    {
         $team = Team::forceCreate([
-            'user_id' => $teacher->id,
-            'team_name' => explode(' ', $teacher->name, 2)[0] . "'s Team",
+            'user_id' => $user->id,
+            'team_name' => explode(' ', $user->name, 2)[0] . "'s Team",
             'personal_team' => true,
         ]);
 
-        $teacher->current_team_id = $team->id;
-        $teacher->save();
+        $user->current_team_id = $team->id;
+        $user->save();
+    }
 
-        return $teacher;
+    public static function create_regular_user(): User
+    {
+        $user = User::create([
+            'name' => 'Regular',
+            'email' => 'regular@videosapp.com',
+            'password' => Hash::make('123456789'),
+        ]);
+
+        self::add_personal_team($user);
+
+        return $user;
+    }
+
+    public static function create_video_manager_user(): User
+    {
+        $user = User::create([
+            'name' => 'Video Manager',
+            'email' => 'videosmanager@videosapp.com',
+            'password' => Hash::make('123456789'),
+        ]);
+
+        self::add_personal_team($user);
+
+        return $user;
+    }
+
+    public static function create_superadmin_user(): User
+    {
+        $user = User::create([
+            'name' => 'Super Admin',
+            'email' => 'superadmin@videosapp.com',
+            'password' => Hash::make('123456789'),
+        ]);
+
+        self::add_personal_team($user);
+
+        return $user;
     }
 }

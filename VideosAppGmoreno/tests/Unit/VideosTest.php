@@ -11,6 +11,8 @@ class VideosTest extends TestCase
 {
     use RefreshDatabase;
 
+    public const TESTED_BY = self::class;
+
     public function test_can_get_formatted_published_at_date()
     {
         $video = Video::create([

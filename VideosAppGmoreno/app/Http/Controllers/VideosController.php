@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\View\View;
 use App\Models\Video;
+use Tests\Unit\VideosTest as UnitVideosTest;
+use Tests\Feature\Videos\VideosTest as FeatureVideosTest;
 
 class VideosController extends Controller
 {
@@ -23,27 +24,26 @@ class VideosController extends Controller
             return response()->json(['message' => 'Video not found'], 404);
         }
 
-        return view('videos.show', compact('video'));
+        // Pasar la información del test junto con el video a la vista
+        return view('videos.show', compact('video' ));
     }
 
     /**
-     * Retorna els testers d'un video.
-     *
-     * @param int $id
-     * @return JsonResponse
+     * Retorna el nombre de la clase del test.
+     * @return string
      */
-    public function testedBy(int $id): JsonResponse
+    public function testedBy(): string
     {
-        $video = Video::find($id);
+        $tests = [];
 
-        if (!$video) {
-            return response()->json(['message' => 'Video not found'], 404);
+        if (class_exists(UnitVideosTest::class)) {
+            $tests[] = UnitVideosTest::class;
         }
 
-        if (!property_exists($video, 'testers')) {
-            return response()->json(['message' => 'Testers not found for this video'], 404);
+        if (class_exists(FeatureVideosTest::class)) {
+            $tests[] = FeatureVideosTest::class;
         }
 
-        return response()->json($video->testers);
+        return !empty($tests) ? implode('<br>', $tests) : 'Desconegut';
     }
 }

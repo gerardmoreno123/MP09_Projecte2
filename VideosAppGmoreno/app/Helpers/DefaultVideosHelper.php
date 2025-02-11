@@ -28,7 +28,7 @@ class DefaultVideosHelper
             'published_at' => '2025-01-13 12:00:00',
             'previous_id' => null,
             'next_id' => null,
-//            'series_id' => null,
+            'series_id' => null,
         ]);
 
         $video2 = Video::create([
@@ -38,7 +38,7 @@ class DefaultVideosHelper
             'published_at' => '2025-01-10 12:00:00',
             'previous_id' => null,
             'next_id' => null,
-//            'series_id' => null,
+            'series_id' => null,
         ]);
 
         $video3 = Video::create([
@@ -48,7 +48,7 @@ class DefaultVideosHelper
             'published_at' => '2025-01-07 12:00:00',
             'previous_id' => null,
             'next_id' => null,
-//            'series_id' => null,
+            'series_id' => null,
         ]);
 
         $video1->update(['next_id' => $video2->id]);

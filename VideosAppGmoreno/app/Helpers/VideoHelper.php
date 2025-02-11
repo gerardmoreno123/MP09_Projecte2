@@ -21,7 +21,7 @@ class VideoHelper
         $carbonDate = $date instanceof Carbon ? $date : Carbon::parse($date);
 
         // Retorna la fecha formateada
-        return $carbonDate->locale('ca')->isoFormat('D [de] MMMM [de] YYYY');
+        return $carbonDate->isoFormat('D [de] MMMM [de] YYYY');
     }
 
 
@@ -40,7 +40,7 @@ class VideoHelper
 
         $carbonDate = $date instanceof Carbon ? $date : Carbon::parse($date);
 
-        return $carbonDate->locale('ca')->diffForHumans();
+        return $carbonDate->diffForHumans();
     }
 
     /**

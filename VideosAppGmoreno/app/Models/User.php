@@ -11,6 +11,7 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
@@ -20,6 +21,7 @@ class User extends Authenticatable
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    use HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -82,6 +84,16 @@ class User extends Authenticatable
         /** @var HasMany<Team, User> $relation */
         $relation = $this->hasMany(Team::class, 'user_id');
         return $relation;
+    }
+
+    public function testedBy()
+    {
+        return $this->name;
+    }
+
+    public function isSuperAdmin()
+    {
+        return $this->super_admin;
     }
 }
 
