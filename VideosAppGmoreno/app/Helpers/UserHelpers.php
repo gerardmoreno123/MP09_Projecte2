@@ -75,6 +75,13 @@ class UserHelpers
 
     public static function create_regular_user(): User
     {
+
+        $existingRegularUser = User::where('email', 'regular@videosapp.com')->first();
+
+        if ($existingRegularUser) {
+            return $existingRegularUser;
+        }
+
         $user = User::create([
             'name' => 'Regular',
             'email' => 'regular@videosapp.com',
@@ -88,6 +95,12 @@ class UserHelpers
 
     public static function create_video_manager_user(): User
     {
+        $existingVideoManager = User::where('email', 'videosmanager@videosapp.com')->first();
+
+        if ($existingVideoManager) {
+            return $existingVideoManager;
+        }
+
         $user = User::create([
             'name' => 'Video Manager',
             'email' => 'videosmanager@videosapp.com',
@@ -101,6 +114,12 @@ class UserHelpers
 
     public static function create_superadmin_user(): User
     {
+        $existingSuperAdmin = User::where('email', 'superadmin@videosapp.com')->first();
+
+        if ($existingSuperAdmin) {
+            return $existingSuperAdmin;
+        }
+
         $user = User::create([
             'name' => 'Super Admin',
             'email' => 'superadmin@videosapp.com',
