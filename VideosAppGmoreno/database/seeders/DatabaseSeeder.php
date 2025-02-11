@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
         $this->command->info("Usuario administrador de videos por defecto creado: {$defaultManageVideosUser->email}");
 
         $defaultSuperAdmin = $userHelpers->create_superadmin_user();
+        $defaultSuperAdmin->assignRole('super-admin');
         $this->command->info("Super administrador por defecto creado: {$defaultSuperAdmin->email}");
 
         $defaultVideos = DefaultVideosHelper::create_default_videos();
