@@ -1,16 +1,12 @@
 <?php
 
-use App\Models\User;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\VideosManageController;
 use App\Http\Controllers\VideosController;
+use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/video/{id}', [VideosController::class, 'show'])->name('videos.show');
-Route::get('/video-tested-by', [VideosController::class, 'testedBy']);
-Route::get('/user-tested-by', [User::class, 'testedBy']);
+// Part publica de l'aplicació
+Route::get('/', [VideosController::class, 'index'])->name('videos.index');
+Route::get('/{video}', [VideosController::class, 'show'])->name('videos.show')->where('video', '[0-9]+');
 
 Route::middleware([
     'auth:sanctum',
