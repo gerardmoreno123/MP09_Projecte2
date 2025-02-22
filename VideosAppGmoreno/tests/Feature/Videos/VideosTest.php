@@ -22,7 +22,7 @@ class VideosTest extends TestCase
 
         $video = $videos[1];
 
-        $response = $this->actingAs($user)->get("/video/{$video->id}");
+        $response = $this->actingAs($user)->get("/{$video->id}");
 
         $response->assertStatus(200);
         $response->assertSee($video->title);
