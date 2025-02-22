@@ -109,6 +109,9 @@ class UserHelpers
 
         self::add_personal_team($user);
 
+        $user->assignRole('video-manager');
+        $user->givePermissionTo(['view-videos', 'manage-videos']);
+
         return $user;
     }
 
@@ -124,9 +127,14 @@ class UserHelpers
             'name' => 'Super Admin',
             'email' => 'superadmin@videosapp.com',
             'password' => Hash::make('123456789'),
+            'super_admin' => true,
         ]);
 
         self::add_personal_team($user);
+
+        // Assign roles and permissions
+        $user->assignRole('super-admin');
+        $user->givePermissionTo(Permission::all());
 
         return $user;
     }

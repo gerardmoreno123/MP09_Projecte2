@@ -13,6 +13,8 @@ class VideosManageControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    public const TESTED_BY = self::class;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -27,25 +29,28 @@ class VideosManageControllerTest extends TestCase
     public function test_user_with_permissions_can_manage_videos()
     {
         $user = $this->loginAsVideoManager();
-        $this->assertTrue($user->can('manage-videos'));
+        $response = $this->actingAs($user)->get('/videosmanage');
+        $response->assertStatus(200);
     }
 
     public function test_regular_users_cannot_manage_videos()
     {
         $user = $this->loginAsRegularUser();
-        $this->assertFalse($user->can('manage-videos'));
+        $response = $this->actingAs($user)->get('/videosmanage');
+        $response->assertStatus(403);
     }
 
     public function test_guest_users_cannot_manage_videos()
     {
-        $user = new User();
-        $this->assertFalse($user->can('manage-videos'));
+        $response = $this->get('/videosmanage');
+        $response->assertStatus(302); // Redirect to login
     }
 
     public function test_superadmins_can_manage_videos()
     {
         $user = $this->loginAsSuperAdmin();
-        $this->assertTrue($user->can('manage-videos'));
+        $response = $this->actingAs($user)->get('/videosmanage');
+        $response->assertStatus(200);
     }
 
     protected function loginAsVideoManager()

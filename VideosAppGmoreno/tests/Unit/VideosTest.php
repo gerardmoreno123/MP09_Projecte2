@@ -13,14 +13,19 @@ class VideosTest extends TestCase
 
     public const TESTED_BY = self::class;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Carbon::setLocale('ca');
+    }
+
     public function test_can_get_formatted_published_at_date()
     {
         $video = Video::create([
-            'title' => 'Video de prueba',
-            'description' => 'Descripción de prueba',
+            'title' => 'Video de prova',
+            'description' => 'Descripció de prova',
             'url' => 'http://test.com',
             'published_at' => Carbon::now()->toDateString(),
-//            'series_id' => null,
         ]);
 
         $formattedDate = $video->getFormattedPublishedAtAttribute();
@@ -33,11 +38,10 @@ class VideosTest extends TestCase
     public function test_can_get_formatted_for_humans_published_at_date()
     {
         $video = Video::create([
-            'title' => 'Video de prueba',
-            'description' => 'Descripción de prueba',
+            'title' => 'Video de prova',
+            'description' => 'Descripció de prova',
             'url' => 'http://test.com',
             'published_at' => Carbon::now()->subDays(3)->toDateString(),
-//            'series_id' => null,
         ]);
 
         $formattedDate = $video->getFormattedForHumansPublishedAtAttribute();
@@ -48,11 +52,10 @@ class VideosTest extends TestCase
     public function test_can_get_published_at_timestamp()
     {
         $video = Video::create([
-            'title' => 'Video de prueba',
-            'description' => 'Descripción de prueba',
+            'title' => 'Video de prova',
+            'description' => 'Descripció de prova',
             'url' => 'http://test.com',
             'published_at' => Carbon::now()->toDateString(),
-//            'series_id' => null,
         ]);
 
         $timestamp = $video->getPublishedAtTimestampAttribute();
@@ -63,16 +66,14 @@ class VideosTest extends TestCase
     public function test_can_get_formatted_published_at_date_when_not_published()
     {
         $video = Video::create([
-            'title' => 'Video sin fecha',
-            'description' => 'Este video no ha sido publicado aún',
+            'title' => 'Video sense data',
+            'description' => 'Aquest video no ha estat publicat encara',
             'url' => 'http://test.com',
             'published_at' => null,
-//            'series_id' => null,
         ]);
 
         $formattedDate = $video->getFormattedPublishedAtAttribute();
 
         $this->assertEquals(null, $formattedDate);
     }
-
 }

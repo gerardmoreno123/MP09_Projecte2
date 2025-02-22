@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Helpers\UserHelpers;
 use App\Helpers\DefaultVideosHelper;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,11 +15,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-
-        //Crear permisos
+        // Crear permisos
         $this->create_permissions();
 
-        //Crear usuaris i videos per defecte
+        // Crear usuaris i videos per defecte
         $userHelpers = new UserHelpers();
         $defaultUser = $userHelpers->create_default_user();
         $this->command->info("Usuario por defecto creado: {$defaultUser->email}");
@@ -57,5 +57,12 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->command->info('Permisos creados: ' . implode(', ', $permissions));
+
+        // Crear rols
+        Role::firstOrCreate(['name' => 'super-admin']);
+        $this->command->info('Role super-admin created');
+
+        Role::firstOrCreate(['name' => 'video-manager']);
+        $this->command->info('Role video-manager created');
     }
 }
