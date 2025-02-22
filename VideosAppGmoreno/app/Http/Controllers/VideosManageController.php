@@ -30,19 +30,35 @@ class VideosManageController extends Controller
      */
     public function store(Request $request)
     {
+        // Validación de los datos del formulario
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'url' => 'required|string|unique:videos,url',
         ]);
 
+        // Obtener todos los datos del request
         $videoData = $request->all();
         $videoData['published_at'] = now();
+        $videoData['previous_id'] = null;
+        $videoData['next_id'] = null;
 
-        Video::create($videoData);
+        // Crear el nuevo vídeo
+        $newVideo = Video::create($videoData);
 
+        // Obtener el último vídeo creado (el que estaría justo antes del nuevo)
+        $previousVideo = Video::orderBy('id', 'desc')->skip(1)->first();
+
+        // Si hay un vídeo anterior, actualizar el previous_id del nuevo vídeo y el next_id del anterior
+        if ($previousVideo) {
+            $newVideo->update(['previous_id' => $previousVideo->id]);
+            $previousVideo->update(['next_id' => $newVideo->id]);
+        }
+
+        // Redirigir a la lista de vídeos con un mensaje de éxito
         return redirect()->route('videos.manage.index')->with('success', 'Video created successfully.');
     }
+
 
     /**
      * Display the specified video.
