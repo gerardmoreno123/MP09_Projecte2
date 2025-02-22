@@ -42,7 +42,14 @@
                 <a href="{{ route('login') }}" class="text-white hover:text-green-400 transition-colors">Iniciar sesión</a>
                 <a href="{{ route('register') }}" class="text-white hover:text-green-400 transition-colors">Registrarse</a>
             @else
-                <a href="{{ route('dashboard') }}" class="text-white hover:text-green-400 transition-colors">Dashboard</a>
+                <span class="text-white">Hola, {{ Auth::user()->name }}</span>
+
+                <!-- Botón de CRUD solo si tiene el rol 'manage-videos' -->
+                @if(auth()->user()->hasAnyRole('video-manager', 'super-admin'))
+                    <a href="{{ route('videos.manage.index') }}" class="hover:text-orange-600 transition-colors">CRUD</a>
+                @endif
+
+                <!-- Botón de Logout -->
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf
                     <button type="submit" class="text-white hover:text-green-400 transition-colors">Cerrar sesión</button>

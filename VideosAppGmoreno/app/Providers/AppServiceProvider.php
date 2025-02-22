@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Route;
+use Spatie\Permission\Middleware\RoleMiddleware;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->define_gates();
         $this->register_policy();
+
+        Route::aliasMiddleware('role', RoleMiddleware::class);
     }
 
     private function define_gates(): void
