@@ -9,10 +9,32 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Helpers\DefaultVideosHelper;
 use App\Helpers\UserHelpers;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class HelpersTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        // Crear permisos necesarios
+        Permission::create(['name' => 'view-videos']);
+        Permission::create(['name' => 'create-videos']);
+        Permission::create(['name' => 'edit-videos']);
+        Permission::create(['name' => 'delete-videos']);;
+        Permission::create(['name' => 'super-admin']);
+
+        $viewerRole = Role::create(['name' => 'viewer']);
+        $videoManagerRole = Role::create(['name' => 'video-manager']);
+        $superAdminRole = Role::create(['name' => 'super-admin']);
+
+        $viewerRole->givePermissionTo('view-videos');
+        $videoManagerRole->givePermissionTo(['view-videos', 'create-videos', 'edit-videos', 'delete-videos']);
+        $superAdminRole->givePermissionTo(Permission::all());
+    }
 
     public function test_create_default_user()
     {
@@ -24,6 +46,9 @@ class HelpersTest extends TestCase
         $this->assertTrue(\Hash::check(config('userdefaults.default_user.password'), $user->password));
         $this->assertInstanceOf(Team::class, $user->currentTeam);
         $this->assertEquals($user->current_team_id, $user->currentTeam->id);
+        $this->assertTrue($user->hasRole('viewer'));
+        $this->assertTrue($user->can('view-videos'));
+
     }
 
     public function test_create_default_teacher()
@@ -36,6 +61,9 @@ class HelpersTest extends TestCase
         $this->assertTrue(\Hash::check(config('userdefaults.default_teacher.password'), $teacher->password));
         $this->assertInstanceOf(Team::class, $teacher->currentTeam);
         $this->assertEquals($teacher->current_team_id, $teacher->currentTeam->id);
+        $this->assertTrue($teacher->hasRole('super-admin'));
+        $this->assertTrue($teacher->can('create-videos'));
+        $this->assertTrue($teacher->can('edit-videos'));
     }
 
     public function test_create_default_videos()

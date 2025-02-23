@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Helpers\UserHelpers;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -12,18 +11,11 @@ use Spatie\Permission\Middleware\RoleMiddleware;
 
 class AppServiceProvider extends ServiceProvider
 {
-
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         $this->define_gates();
@@ -39,15 +31,19 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('view-videos', function (User $user) {
-            return $user->hasRole('regular') || $user->hasRole('video-manager') || $user->hasRole('super-admin');
+            return $user->hasPermissionTo('view-videos');
         });
 
-        Gate::define('manage-videos', function (User $user) {
-            return $user->hasRole('video-manager') || $user->hasRole('super-admin');
+        Gate::define('create-videos', function (User $user) {
+            return $user->hasPermissionTo('create-videos');
         });
 
-        Gate::define('edit-users', function (User $user) {
-            return $user->hasRole('super-admin');
+        Gate::define('edit-videos', function (User $user) {
+            return $user->hasPermissionTo('edit-videos');
+        });
+
+        Gate::define('delete-videos', function (User $user) {
+            return $user->hasPermissionTo('delete-videos');
         });
     }
 
