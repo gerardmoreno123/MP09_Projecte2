@@ -11,6 +11,15 @@ use Tests\Feature\Videos\VideosTest as FeatureVideosTest;
 class VideosController extends Controller
 {
     /**
+     * Display a listing of the videos.
+     */
+    public function index()
+    {
+        $videos = Video::all();
+        return view('videos.index', compact('videos'));
+    }
+
+    /**
      * Mostra un video per la seva ID.
      *
      * @param int $id

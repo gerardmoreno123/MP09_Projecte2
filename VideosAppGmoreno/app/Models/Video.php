@@ -28,6 +28,33 @@ class Video extends Model
         'published_at' => 'datetime',
     ];
 
+    // Relación con el video anterior
+    public function previous()
+    {
+        return $this->belongsTo(Video::class, 'previous_id');
+    }
+
+    // Relación con el video siguiente
+    public function next()
+    {
+        return $this->belongsTo(Video::class, 'next_id');
+    }
+
+    // Cuando eliminas un video, actualizas las relaciones de los videos anteriores y siguientes
+    protected static function booted()
+    {
+        static::deleting(function ($video) {
+            // Desvincula las relaciones si es necesario
+            if ($video->previous) {
+                $video->previous->update(['next_id' => null]);
+            }
+
+            if ($video->next) {
+                $video->next->update(['previous_id' => null]);
+            }
+        });
+    }
+
     /**
      * Format de la data de publicació
      *
@@ -58,4 +85,6 @@ class Video extends Model
     {
         return VideoHelper::getPublishedAtTimestampAttribute($this->published_at);
     }
+
+
 }

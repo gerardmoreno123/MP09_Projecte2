@@ -6,27 +6,70 @@
     <title>VídeosApp Gmoreno</title>
     <script src="{{ asset('js/app.js') }}"></script>
     @vite('resources/css/app.css')
+    <style>
+        body {
+            background-color: #1a202c; /* Tailwind's bg-gray-900 */
+            color: #fff; /* Tailwind's text-white */
+        }
+        .btn-green {
+            background-color: #38a169; /* Tailwind's green-500 */
+            color: #fff;
+        }
+        .btn-green:hover {
+            background-color: #2f855a; /* Tailwind's green-600 */
+        }
+        .btn-orange {
+            background-color: #ed8936; /* Tailwind's orange-500 */
+            color: #fff;
+        }
+        .btn-orange:hover {
+            background-color: #dd6b20; /* Tailwind's orange-600 */
+        }
+    </style>
 </head>
-<body class="bg-gray-100 flex flex-col min-h-screen">
+<body class="bg-gray-900 text-white flex flex-col min-h-screen">
 
-<!-- Cabecera -->
-<header class="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-4">
-    <nav class="navbar navbar-expand-lg navbar-light container">
-        <a class="mx-5 navbar-brand text-3xl font-semibold" href="{{ route('videos.show', ['id' => rand(1,3)]) }}"> Video Random</a>
-    </nav>
+<!-- Header -->
+<header class="bg-gray-800 text-white py-4 shadow-lg">
+    <div class="container mx-auto px-4 sm:px-6 flex justify-between items-center">
+        <a href="{{ route('videos.index') }}" class="text-white">
+            <h1 class="text-3xl font-semibold">VídeosApp Gmoreno</h1>
+        </a>
+
+        <!-- Navigation Menu -->
+        <nav class="space-x-6">
+            @guest
+                <a href="{{ route('login') }}" class="text-white hover:text-green-400 transition-colors">Iniciar sesión</a>
+                <a href="{{ route('register') }}" class="text-white hover:text-green-400 transition-colors">Registrarse</a>
+            @else
+                <span class="text-white">Hola, {{ Auth::user()->name }}</span>
+
+                <!-- Botón de CRUD solo si tiene el rol 'manage-videos' -->
+                @if(auth()->user()->hasAnyRole('video-manager', 'super-admin'))
+                    <a href="{{ route('videos.manage.index') }}" class="hover:text-orange-600 transition-colors">CRUD</a>
+                @endif
+
+                <!-- Botón de Logout -->
+                <form method="POST" action="{{ route('logout') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="text-white hover:text-green-400 transition-colors">Cerrar sesión</button>
+                </form>
+            @endguest
+        </nav>
+    </div>
 </header>
 
-<!-- Contenido principal -->
-<main class="flex-grow bg-gray-200">
-    <div class="container mx-auto px-4 md:px-6 py-8">
+<!-- Main Content -->
+<main class="flex-grow bg-gray-900">
+    <div class="container mx-auto px-4 sm:px-6 py-8">
         @yield('content')
     </div>
 </main>
 
-<!-- Pie de página -->
-<footer class="bg-gray-800 text-center text-white py-4">
+<!-- Footer -->
+<footer class="bg-gray-800 text-center text-white py-4 mt-6">
     <div class="text-center p-3">
-        &copy; 2025 <a class="text-blue-400" href="https://github.com/gerardmoreno123" target="_blank">Gmoreno</a>
+        &copy; 2025 <a class="text-green-400 hover:text-green-600 transition-colors" href="https://github.com/gerardmoreno123" target="_blank">Gmoreno</a>
     </div>
 </footer>
 

@@ -6,55 +6,47 @@ use Illuminate\Database\Seeder;
 use App\Helpers\UserHelpers;
 use App\Helpers\DefaultVideosHelper;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
+        $this->create_permissions_and_roles();
 
-        //Crear permisos
-        $this->create_permissions();
-
-        //Crear usuaris i videos per defecte
         $userHelpers = new UserHelpers();
         $defaultUser = $userHelpers->create_default_user();
-        $this->command->info("Usuario por defecto creado: {$defaultUser->email}");
+        $this->command->info("Default user created: {$defaultUser->email}");
 
         $defaultTeacher = $userHelpers->create_default_teacher();
-        $this->command->info("Profesor por defecto creado: {$defaultTeacher->email}");
+        $this->command->info("Default teacher created: {$defaultTeacher->email}");
 
         $defaultRegularUser = $userHelpers->create_regular_user();
-        $this->command->info("Usuario regular por defecto creado: {$defaultRegularUser->email}");
+        $this->command->info("Default regular user created: {$defaultRegularUser->email}");
 
         $defaultManageVideosUser = $userHelpers->create_video_manager_user();
-        $this->command->info("Usuario administrador de videos por defecto creado: {$defaultManageVideosUser->email}");
+        $this->command->info("Default video manager created: {$defaultManageVideosUser->email}");
 
         $defaultSuperAdmin = $userHelpers->create_superadmin_user();
-        $this->command->info("Super administrador por defecto creado: {$defaultSuperAdmin->email}");
+        $this->command->info("Default super admin created: {$defaultSuperAdmin->email}");
 
         $defaultVideos = DefaultVideosHelper::create_default_videos();
-        $this->command->info("Videos creados: " . $defaultVideos->pluck('title')->join(', '));
+        $this->command->info("Videos created: " . $defaultVideos->pluck('title')->join(', '));
     }
 
-    /**
-     * Crear permisos
-     */
-    private function create_permissions(): void
+    private function create_permissions_and_roles(): void
     {
-        $permissions = [
-            'view-videos',
-            'manage-videos',
-            'edit-users',
-            'super-admin',
-        ];
+        UserHelpers::create_video_permissions();
 
-        foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
-        }
+        $viewerRole = Role::firstOrCreate(['name' => 'viewer']);
+        $viewerRole->givePermissionTo('view-videos');
 
-        $this->command->info('Permisos creados: ' . implode(', ', $permissions));
+        $videoManagerRole = Role::firstOrCreate(['name' => 'video-manager']);
+        $videoManagerRole->givePermissionTo(['view-videos', 'create-videos', 'edit-videos', 'delete-videos']);
+
+        $superAdminRole = Role::firstOrCreate(['name' => 'super-admin']);
+        $superAdminRole->givePermissionTo(Permission::all());
+
+        $this->command->info('Roles and permissions created');
     }
 }

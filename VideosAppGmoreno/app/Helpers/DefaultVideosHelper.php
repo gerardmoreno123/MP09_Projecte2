@@ -14,7 +14,6 @@ class DefaultVideosHelper
      */
     public static function create_default_videos(): Collection
     {
-
         $existingVideos = Video::all();
         if ($existingVideos->isNotEmpty()) {
             return $existingVideos;

@@ -9,7 +9,6 @@ export default {
         './vendor/laravel/jetstream/**/*.blade.php',
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
-        "./resources/views/**/*.blade.php",
         "./resources/js/**/*.js",
         "./index.html",
         "./src/**/*.{vue,js,ts,jsx,tsx}",
@@ -19,6 +18,9 @@ export default {
         extend: {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+            },
+            colors: {
+                ...defaultTheme.colors,  // Asegura que todos los colores estándar estén disponibles
             },
         },
     },

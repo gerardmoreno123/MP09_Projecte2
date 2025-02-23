@@ -4,9 +4,7 @@ namespace App\Helpers;
 
 use App\Models\User;
 use App\Models\Team;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
-use InvalidArgumentException;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -15,10 +13,6 @@ class UserHelpers
     public static function create_default_user(): User
     {
         $password = config('userdefaults.default_user.password');
-        if (!is_string($password)) {
-            throw new InvalidArgumentException('El valor de la contraseña debe ser una cadena.');
-        }
-
         $existingUser = User::where('email', config('userdefaults.default_user.email'))->first();
 
         if ($existingUser) {
@@ -32,6 +26,7 @@ class UserHelpers
         ]);
 
         self::add_personal_team($user);
+        $user->assignRole('viewer');
 
         return $user;
     }
@@ -39,10 +34,6 @@ class UserHelpers
     public static function create_default_teacher(): User
     {
         $password = config('userdefaults.default_teacher.password');
-        if (!is_string($password)) {
-            throw new InvalidArgumentException('El valor de la contraseña debe ser una cadena.');
-        }
-
         $existingTeacher = User::where('email', config('userdefaults.default_teacher.email'))->first();
 
         if ($existingTeacher) {
@@ -57,25 +48,13 @@ class UserHelpers
         ]);
 
         self::add_personal_team($teacher);
+        $teacher->assignRole('super-admin');
 
         return $teacher;
     }
 
-    public static function add_personal_team(User $user)
-    {
-        $team = Team::forceCreate([
-            'user_id' => $user->id,
-            'team_name' => explode(' ', $user->name, 2)[0] . "'s Team",
-            'personal_team' => true,
-        ]);
-
-        $user->current_team_id = $team->id;
-        $user->save();
-    }
-
     public static function create_regular_user(): User
     {
-
         $existingRegularUser = User::where('email', 'regular@videosapp.com')->first();
 
         if ($existingRegularUser) {
@@ -89,6 +68,7 @@ class UserHelpers
         ]);
 
         self::add_personal_team($user);
+        $user->assignRole('viewer');
 
         return $user;
     }
@@ -108,6 +88,7 @@ class UserHelpers
         ]);
 
         self::add_personal_team($user);
+        $user->assignRole('video-manager');
 
         return $user;
     }
@@ -124,10 +105,38 @@ class UserHelpers
             'name' => 'Super Admin',
             'email' => 'superadmin@videosapp.com',
             'password' => Hash::make('123456789'),
+            'super_admin' => true,
         ]);
 
         self::add_personal_team($user);
+        $user->assignRole('super-admin');
 
         return $user;
+    }
+
+    public static function add_personal_team(User $user)
+    {
+        $team = Team::forceCreate([
+            'user_id' => $user->id,
+            'team_name' => explode(' ', $user->name, 2)[0] . "'s Team",
+            'personal_team' => true,
+        ]);
+
+        $user->current_team_id = $team->id;
+        $user->save();
+    }
+
+    public static function create_video_permissions()
+    {
+        $permissions = [
+            'view-videos',
+            'create-videos',
+            'edit-videos',
+            'delete-videos',
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
+        }
     }
 }
