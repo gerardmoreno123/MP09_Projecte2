@@ -47,3 +47,31 @@ Aquest projecte és una plataforma per gestionar i visualitzar vídeos, on els u
 - Creació del test `UserTest` per validar `isSuperAdmin()`.
 
 ---
+
+## Sprint 4: Correccions, CRUD de Videos i Proves
+
+- Correcció d'errors del **Sprint 3**.
+- Comprovació dels tests per validar accessos a `/videos/manage`.
+- Creació del **VideosManageController** amb `testedBy`, `index`, `store`, `show`, `edit`, `update`, `delete` i `destroy`.
+- Afegit `index` a **VideosController**.
+- Revisió de `helpers` per incloure 3 vídeos al **DatabaseSeeder**.
+- Creació de les vistes per al CRUD amb permisos:
+    - `resources/views/videos/manage/index.blade.php` (llista vídeos)
+    - `resources/views/videos/manage/create.blade.php` (formulari amb `data-qa` per tests)
+    - `resources/views/videos/manage/edit.blade.php` (edició de vídeos)
+    - `resources/views/videos/manage/delete.blade.php` (confirmació eliminació)
+- Creació de `resources/views/videos/index.blade.php` per mostrar tots els vídeos (estil YouTube) i accés al detall.
+- Modificació del test `user_with_permissions_can_manage_videos()` per incloure 3 vídeos.
+- Creació de permisos per al CRUD de vídeos a `helpers` i assignació als usuaris.
+- Afegits tests a **VideoTest**:
+    - `user_without_permissions_can_see_default_videos_page`
+    - `user_with_permissions_can_see_default_videos_page`
+    - `not_logged_users_can_see_default_videos_page`
+- Afegits tests a **VideosManageControllerTest**:
+    - `loginAsVideoManager`, `loginAsSuperAdmin`, `loginAsRegularUser`
+    - Proves de permisos per veure, crear, editar i eliminar vídeos.
+- Creació de rutes `videos/manage` amb middleware corresponent.
+- Les rutes CRUD només es mostren si l'usuari està loguejat; la d'índex és pública.
+- Afegits **navbar** i **footer** a `resources/layouts/videosapp.blade.php` per la navegació.
+
+---
