@@ -2,9 +2,12 @@
 
 namespace Tests\Unit;
 
+use App\Helpers\UserHelpers;
 use App\Models\Video;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class VideosTest extends TestCase
@@ -13,10 +16,30 @@ class VideosTest extends TestCase
 
     public const TESTED_BY = self::class;
 
+    protected $regular;
+
     protected function setUp(): void
     {
         parent::setUp();
         Carbon::setLocale('ca');
+
+        // Crear permisos necesarios
+        Permission::create(['name' => 'view-videos']);
+        Permission::create(['name' => 'create-videos']);
+        Permission::create(['name' => 'edit-videos']);
+        Permission::create(['name' => 'delete-videos']);
+        Permission::create(['name' => 'super-admin']);
+
+        $viewerRole = Role::create(['name' => 'viewer']);
+        $videoManagerRole = Role::create(['name' => 'video-manager']);
+        $superAdminRole = Role::create(['name' => 'super-admin']);
+
+        $viewerRole->givePermissionTo('view-videos');
+        $videoManagerRole->givePermissionTo(['view-videos', 'create-videos', 'edit-videos', 'delete-videos']);
+        $superAdminRole->givePermissionTo(Permission::all());
+
+        // Create default users
+        $this->regular = (new UserHelpers())->create_regular_user();
     }
 
     public function test_can_get_formatted_published_at_date()
@@ -26,6 +49,7 @@ class VideosTest extends TestCase
             'description' => 'Descripció de prova',
             'url' => 'http://test.com',
             'published_at' => Carbon::now()->toDateString(),
+            'user_id' => $this->regular->id,
         ]);
 
         $formattedDate = $video->getFormattedPublishedAtAttribute();
@@ -42,6 +66,7 @@ class VideosTest extends TestCase
             'description' => 'Descripció de prova',
             'url' => 'http://test.com',
             'published_at' => Carbon::now()->subDays(3)->toDateString(),
+            'user_id' => $this->regular->id,
         ]);
 
         $formattedDate = $video->getFormattedForHumansPublishedAtAttribute();
@@ -56,6 +81,7 @@ class VideosTest extends TestCase
             'description' => 'Descripció de prova',
             'url' => 'http://test.com',
             'published_at' => Carbon::now()->toDateString(),
+            'user_id' => $this->regular->id,
         ]);
 
         $timestamp = $video->getPublishedAtTimestampAttribute();
@@ -70,6 +96,7 @@ class VideosTest extends TestCase
             'description' => 'Aquest video no ha estat publicat encara',
             'url' => 'http://test.com',
             'published_at' => null,
+            'user_id' => $this->regular->id,
         ]);
 
         $formattedDate = $video->getFormattedPublishedAtAttribute();

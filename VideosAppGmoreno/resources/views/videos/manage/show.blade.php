@@ -1,9 +1,9 @@
-@extends('layouts.videos-app-layout')
+@extends('layouts.admin')
 
-@section('content')
+@section('admin-content')
     <div class="container mx-auto px-4 text-center">
         <!-- Tabs -->
-        <div class="flex justify-center space-x-6 pb-2 mb-6">
+        <div class="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-6 pb-2 mb-6">
             <a href="{{ route('videos.manage.index') }}" class="text-lg font-semibold text-gray-400 pb-2 inline-block text-center w-full hover:text-green-400 hover:border-green-400 hover:border-b-2 transition duration-200">Llista de Vídeos</a>
             <a href="{{ route('videos.manage.create') }}" class="text-lg font-semibold text-gray-400 pb-2 inline-block text-center w-full hover:text-green-400 hover:border-green-400 hover:border-b-2 transition duration-200">Afegir Vídeo</a>
             <a href="{{ route('videos.manage.show', $video->id) }}" class="text-lg font-semibold text-green-400 border-b-2 pb-2 inline-block text-center w-full">Veure dades del vídeo</a>
@@ -16,7 +16,7 @@
                 <div class="text-left w-full sm:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col space-y-4 h-full mx-auto">
                     <h2 class="w-full text-3xl text-teal-400 font-semibold">Títol: {{ $video->title }}</h2>
                     <p class="text-lg text-gray-400">Publicat el: {{ $video->published_at ? $video->published_at->format('d/m/Y') : 'No publicat' }}</p>
-
+                    <p class="text-lg text-gray-400">Publicat per: {{ $video->user->name }}</p>
                     <div class="w-full">
                         <h3 class="text-2xl text-teal-400 font-semibold">Descripció</h3>
                         <p class="text-lg text-gray-300">{{ $video->description ?? 'No disponible' }}</p>

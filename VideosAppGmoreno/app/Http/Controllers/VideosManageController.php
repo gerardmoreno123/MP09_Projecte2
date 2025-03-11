@@ -42,6 +42,7 @@ class VideosManageController extends Controller
         $videoData['published_at'] = now();
         $videoData['previous_id'] = null;
         $videoData['next_id'] = null;
+        $videoData['user_id'] = auth()->id();
 
         // Crear el nuevo vídeo
         $newVideo = Video::create($videoData);
@@ -58,7 +59,6 @@ class VideosManageController extends Controller
         // Redirigir a la lista de vídeos con un mensaje de éxito
         return redirect()->route('videos.manage.index')->with('success', 'Video created successfully.');
     }
-
 
     /**
      * Display the specified video.

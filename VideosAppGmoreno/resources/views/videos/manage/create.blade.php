@@ -1,9 +1,9 @@
-@extends('layouts.videos-app-layout')
+@extends('layouts.admin')
 
-@section('content')
+@section('admin-content')
     <div class="container mx-auto px-4 text-center">
         <!-- Tabs -->
-        <div class="flex justify-center space-x-6 pb-2 mb-6">
+        <div class="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-6 pb-2 mb-6">
             <a href="{{ route('videos.manage.index') }}" class="text-lg font-semibold text-gray-400 pb-2 inline-block text-center w-full hover:text-green-400 hover:border-green-400 hover:border-b-2 transition duration-200">Llista de Vídeos</a>
             <a href="{{ route('videos.manage.create') }}" class="text-lg font-semibold text-green-400 border-b-2 pb-2 inline-block text-center w-full">Afegir Vídeo</a>
         </div>

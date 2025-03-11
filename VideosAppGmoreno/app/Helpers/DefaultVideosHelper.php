@@ -19,6 +19,11 @@ class DefaultVideosHelper
             return $existingVideos;
         }
 
+        // Crear usuaris
+        $regular = (new UserHelpers())->create_regular_user();
+        $videoManager = (new UserHelpers())->create_video_manager_user();
+        $superAdmin = (new UserHelpers())->create_superadmin_user();
+
         // Crear los tres videos
         $video1 = Video::create([
             'title' => 'Video 1',
@@ -28,6 +33,7 @@ class DefaultVideosHelper
             'previous_id' => null,
             'next_id' => null,
             'series_id' => null,
+            'user_id' => $regular->id,
         ]);
 
         $video2 = Video::create([
@@ -38,6 +44,7 @@ class DefaultVideosHelper
             'previous_id' => null,
             'next_id' => null,
             'series_id' => null,
+            'user_id' => $videoManager->id,
         ]);
 
         $video3 = Video::create([
@@ -48,6 +55,7 @@ class DefaultVideosHelper
             'previous_id' => null,
             'next_id' => null,
             'series_id' => null,
+            'user_id' => $superAdmin->id,
         ]);
 
         $video1->update(['next_id' => $video2->id]);

@@ -26,10 +26,12 @@ class AppServiceProvider extends ServiceProvider
 
     private function define_gates(): void
     {
+        // Super admin gate
         Gate::before(function (User $user) {
             return $user->hasRole('super-admin') ? true : null;
         });
 
+        // Gates for video CRUD operations
         Gate::define('view-videos', function (User $user) {
             return $user->hasPermissionTo('view-videos');
         });
@@ -44,6 +46,23 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define('delete-videos', function (User $user) {
             return $user->hasPermissionTo('delete-videos');
+        });
+
+        // Gates for user CRUD operations
+        Gate::define('view-users', function (User $user) {
+            return $user->hasPermissionTo('view-users');
+        });
+
+        Gate::define('create-users', function (User $user) {
+            return $user->hasPermissionTo('create-users');
+        });
+
+        Gate::define('edit-users', function (User $user) {
+            return $user->hasPermissionTo('edit-users');
+        });
+
+        Gate::define('delete-users', function (User $user) {
+            return $user->hasPermissionTo('delete-users');
         });
     }
 

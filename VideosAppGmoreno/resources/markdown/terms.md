@@ -75,3 +75,50 @@ Aquest projecte és una plataforma per gestionar i visualitzar vídeos, on els u
 - Afegits **navbar** i **footer** a `resources/layouts/videosapp.blade.php` per la navegació.
 
 ---
+
+## Sprint 5: Millores en la Gestió d'Usuaris i Dashboard
+
+- Solució errors Sprint 4
+- Afegir el camp `user_id`
+    - Migració
+        - Afegit el camp `user_id`.
+    - Model
+        - Inclosa la relació amb l'usuari.
+    - Controller
+        - Assignació automàtica de `user_id` amb `auth->id`.
+    - Helpers
+        - Modificat per incloure el nou camp.
+    - Tests
+        - Verificat mitjançant `Seeder` i la vista `show` del CRUD.
+- Correcció d'errors en tests
+    - Errors derivats de la manca de `user_id`.
+    - Inicialització correcta de variables en tests relacionats amb vídeos i usuaris.
+- Implementació del CRUD per gestionar usuaris
+    - Seguint el mateix esquema que vídeos.
+    - Assignació de rols en la creació i edició d'usuaris.
+    - Protecció de rutes amb permisos específics (`user-manager` i `superadmin`).
+    - Creació de vistes per a:
+        - `index` (llista d'usuaris).
+        - `create` (formulari de creació).
+        - `edit` (formulari d'edició).
+        - `delete` (confirmació d'eliminació).
+- Implementació de perfils d’usuaris
+    - Creació de `index` i `show` per mostrar usuaris i els seus perfils.
+    - Relació entre usuaris i vídeos al model `User`.
+    - Creació de rutes protegides per a usuaris loguejats.
+    - Modificació de la navegació per incloure accés als perfils.
+    - Creació de vistes per mostrar informació d’usuaris i els seus vídeos.
+- Permisos i rols
+    - Creació del rol `user-manager` amb permisos per gestionar usuaris.
+    - Assignació del permís `view-users` al rol `viewer`.
+    - Els `super-admins` tenen automàticament tots els permisos.
+    - Definició de `gates` per restringir accés segons permisos.
+- Implementació del nou layout amb **sidebar**
+    - Restricció d’accés als CRUDs segons rols.
+    - Modificació del layout de cada CRUD per utilitzar el nou dashboard.
+- Millores en el disseny responsive
+    - Implementació de **menú hamburguesa** per al `nav`.
+    - Adaptació del **sidebar** per a dispositius mòbils.
+
+
+---

@@ -129,10 +129,17 @@ class UserHelpers
     public static function create_video_permissions()
     {
         $permissions = [
+            //CRUD permissions for videos
             'view-videos',
             'create-videos',
             'edit-videos',
             'delete-videos',
+
+            //CRUD permissions for users
+            'view-users',
+            'create-users',
+            'edit-users',
+            'delete-users',
         ];
 
         foreach ($permissions as $permission) {

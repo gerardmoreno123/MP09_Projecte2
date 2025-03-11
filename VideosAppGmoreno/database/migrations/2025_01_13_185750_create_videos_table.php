@@ -21,6 +21,7 @@ return new class extends Migration
             $table->foreignId('next_id')->nullable()->constrained('videos')->onDelete('set null');
             $table->integer('series_id')->nullable();
 //            $table->foreignId('series_id')->nullable()->constrained('series'); # Al no existir la taula séries, mostra error al fer els seeders.
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
         });
 

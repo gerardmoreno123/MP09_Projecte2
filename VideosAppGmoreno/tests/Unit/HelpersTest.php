@@ -24,7 +24,7 @@ class HelpersTest extends TestCase
         Permission::create(['name' => 'view-videos']);
         Permission::create(['name' => 'create-videos']);
         Permission::create(['name' => 'edit-videos']);
-        Permission::create(['name' => 'delete-videos']);;
+        Permission::create(['name' => 'delete-videos']);
         Permission::create(['name' => 'super-admin']);
 
         $viewerRole = Role::create(['name' => 'viewer']);
@@ -48,7 +48,6 @@ class HelpersTest extends TestCase
         $this->assertEquals($user->current_team_id, $user->currentTeam->id);
         $this->assertTrue($user->hasRole('viewer'));
         $this->assertTrue($user->can('view-videos'));
-
     }
 
     public function test_create_default_teacher()
@@ -86,18 +85,21 @@ class HelpersTest extends TestCase
         $this->assertEquals('https://www.youtube.com/embed/VRvmn2WA0Q8?si=ih-tb-l0SKeoFl1p', $video1->url);
         $this->assertEquals(null, $video1->previous_id);
         $this->assertEquals(2, $video1->next_id);
+        $this->assertEquals(User::where('email', 'regular@videosapp.com')->first()->id, $video1->user_id);
 
         // Verifica las propiedades del segundo video
         $video2 = $videos[1];
         $this->assertEquals('Video 2', $video2->title);
         $this->assertEquals(1, $video2->previous_id);
         $this->assertEquals(3, $video2->next_id);
+        $this->assertEquals(User::where('email', 'videosmanager@videosapp.com')->first()->id, $video2->user_id);
 
         // Verifica las propiedades del tercer video
         $video3 = $videos[2];
         $this->assertEquals('Video 3', $video3->title);
         $this->assertEquals(2, $video3->previous_id);
         $this->assertEquals(null, $video3->next_id);
+        $this->assertEquals(User::where('email', 'superadmin@videosapp.com')->first()->id, $video3->user_id);
 
         // Verifica que los videos existen en la base de datos
         $this->assertDatabaseHas('videos', ['title' => 'Video 1']);

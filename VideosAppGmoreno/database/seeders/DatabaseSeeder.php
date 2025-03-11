@@ -39,10 +39,13 @@ class DatabaseSeeder extends Seeder
         UserHelpers::create_video_permissions();
 
         $viewerRole = Role::firstOrCreate(['name' => 'viewer']);
-        $viewerRole->givePermissionTo('view-videos');
+        $viewerRole->givePermissionTo('view-videos', 'view-users');
 
         $videoManagerRole = Role::firstOrCreate(['name' => 'video-manager']);
         $videoManagerRole->givePermissionTo(['view-videos', 'create-videos', 'edit-videos', 'delete-videos']);
+
+        $userManagerRole = Role::firstOrCreate(['name' => 'user-manager']);
+        $userManagerRole->givePermissionTo(['view-users', 'create-users', 'edit-users', 'delete-users']);
 
         $superAdminRole = Role::firstOrCreate(['name' => 'super-admin']);
         $superAdminRole->givePermissionTo(Permission::all());

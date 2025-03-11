@@ -22,11 +22,18 @@ class Video extends Model
         'previous_id',
         'next_id',
         'series_id',
+        'user_id',
     ];
 
     protected $casts = [
         'published_at' => 'datetime',
     ];
+
+    // Relación con el usuario
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
     // Relación con el video anterior
     public function previous()

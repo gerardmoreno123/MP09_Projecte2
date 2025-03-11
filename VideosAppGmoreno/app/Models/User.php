@@ -34,6 +34,7 @@ class User extends Authenticatable
         'email',
         'password',
         'current_team_id',
+        'profile_photo_path',
     ];
 
     /**
@@ -84,6 +85,18 @@ class User extends Authenticatable
     {
         /** @var HasMany<Team, User> $relation */
         $relation = $this->hasMany(Team::class, 'user_id');
+        return $relation;
+    }
+
+    /**
+     * Relationship: Videos.
+     *
+     * @return HasMany<Video, User>
+     */
+    public function videos(): HasMany
+    {
+        /** @var HasMany<Video, User> $relation */
+        $relation = $this->hasMany(Video::class, 'user_id');
         return $relation;
     }
 
