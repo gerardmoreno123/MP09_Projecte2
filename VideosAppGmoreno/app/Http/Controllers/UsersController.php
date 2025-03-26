@@ -20,14 +20,18 @@ class UsersController extends Controller
     /**
      * Show the users.
      */
-    public function show(int $id): View|JsonResponse
+    public function show(): JsonResponse
     {
-        $user = User::with('videos')->find($id);
+        // Retornar videos i multimedia de l'usuari autenticat
+        $user = User::with('videos', 'multimedia')->find(auth()->id());
+
 
         if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+            return response()->json(['message' => 'User not authenticated or not found'], 401);
         }
 
-        return view('users.show', compact('user' ));
+        return response()->json([
+            'data' => $user,
+        ], 200);
     }
 }

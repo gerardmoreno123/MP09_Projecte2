@@ -11,9 +11,16 @@ class VideosManageController extends Controller
     /**
      * Display a listing of the videos.
      */
-    public function index()
+    public function index(Request $request)
     {
         $videos = Video::all();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'data' => $videos,
+            ], 200);
+        }
+
         return view('videos.manage.index', compact('videos'));
     }
 
@@ -56,6 +63,12 @@ class VideosManageController extends Controller
             $previousVideo->update(['next_id' => $newVideo->id]);
         }
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'Video created successfully.',
+            ], 201);
+        }
+
         // Redirigir a la lista de vídeos con un mensaje de éxito
         return redirect()->route('videos.manage.index')->with('success', 'Video created successfully.');
     }
@@ -63,18 +76,34 @@ class VideosManageController extends Controller
     /**
      * Display the specified video.
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
         $video = Video::findOrFail($id);
+
+        $video->user_id = $video->user->name;
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'data' => $video,
+            ], 200);
+        }
+
         return view('videos.manage.show', compact('video'));
     }
 
     /**
      * Show the form for editing the specified video.
      */
-    public function edit($id)
+    public function edit($id, Request $request)
     {
         $video = Video::findOrFail($id);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'data' => $video,
+            ], 200);
+        }
+
         return view('videos.manage.edit', compact('video'));
     }
 
@@ -109,10 +138,16 @@ class VideosManageController extends Controller
     /**
      * Eliminar el vídeo de manera permanent.
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         $video = Video::findOrFail($id);
         $video->forceDelete();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'Video permanetly deleted.',
+            ], 201);
+        }
 
         return redirect()->route('videos.manage.index')->with('success', 'Video permanently deleted.');
     }

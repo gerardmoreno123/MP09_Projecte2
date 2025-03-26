@@ -100,6 +100,11 @@ class User extends Authenticatable
         return $relation;
     }
 
+    public function multimedia(): HasMany
+    {
+        return $this->hasMany(Multimedia::class, 'user_id');
+    }
+
     public function testedBy()
     {
         $tests = [];
