@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -59,6 +60,12 @@ class UsersManageController extends Controller
         }
 
         $newUser = User::create($userData);
+
+        Team::forceCreate([
+            'user_id' => $newUser->id,
+            'team_name' => $newUser->name . "'s Team",
+            'personal_team' => true,
+        ]);
         $newUser->syncRoles($userData['roles']);
 
         return redirect()->route('users.manage.index')->with('success', 'User created successfully.');

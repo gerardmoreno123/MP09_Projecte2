@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class UsersController extends Controller
@@ -20,7 +23,7 @@ class UsersController extends Controller
     /**
      * Show the users.
      */
-    public function show(): JsonResponse
+    public function show(Request $request): Factory|\Illuminate\Contracts\View\View|Application|JsonResponse
     {
         // Retornar videos i multimedia de l'usuari autenticat
         $user = User::with('videos', 'multimedia')->find(auth()->id());
@@ -30,8 +33,12 @@ class UsersController extends Controller
             return response()->json(['message' => 'User not authenticated or not found'], 401);
         }
 
-        return response()->json([
-            'data' => $user,
-        ], 200);
+        if ($request->expectsJson()) {
+            return response()->json([
+                'data' => $user,
+            ], 200);
+        }
+
+        return view('users.show', compact('user'));
     }
 }
