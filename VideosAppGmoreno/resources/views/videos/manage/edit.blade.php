@@ -1,54 +1,102 @@
 @extends('layouts.admin')
 
 @section('admin-content')
-    <div class="container mx-auto px-4 text-center">
-        <!-- Tabs -->
-        <div class="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-6 pb-2 mb-6">
-            <a href="{{ route('videos.manage.index') }}" class="text-lg font-semibold text-gray-400 pb-2 inline-block text-center w-full hover:text-green-400 hover:border-green-400 hover:border-b-2 transition duration-200">Llista de Vídeos</a>
-            <a href="{{ route('videos.manage.create') }}" class="text-lg font-semibold text-gray-400 pb-2 inline-block text-center w-full hover:text-green-400 hover:border-green-400 hover:border-b-2 transition duration-200">Afegir Vídeo</a>
-            <a href="{{ route('videos.manage.edit', $video->id) }}" class="text-lg font-semibold text-blue-400 border-b-2 pb-2 inline-block text-center w-full">Editar Vídeo</a>
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Breadcrumbs -->
+        <nav class="flex mb-6" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{{ route('videos.manage.index') }}" class="inline-flex items-center text-sm font-medium text-slate-400 hover:text-blue-400 transition-colors">
+                        <i class="fas fa-video mr-2"></i>
+                        Videos
+                    </a>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-xs text-slate-500 mx-2"></i>
+                        <span class="text-sm font-medium text-blue-400">Editar video</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Form Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-bold text-white">
+                <i class="fas fa-edit text-blue-400 mr-2"></i>
+                Editar video: {{ $video->title }}
+            </h1>
         </div>
 
-        <!-- Contenedor del formulari -->
-        <div class="max-w-lg mx-auto bg-gray-800 p-8 rounded-lg shadow-lg">
-            <h2 class="text-3xl font-semibold text-teal-400 mb-6">Editar Vídeo</h2>
+        <!-- Form -->
+        <form action="{{ route('videos.manage.update', $video->id) }}" method="POST" class="bg-slate-800 rounded-xl shadow-lg p-6">
+            @csrf
+            @method('PUT')
 
-            <form action="{{ route('videos.manage.update', $video->id) }}" method="POST" class="space-y-4">
-                @csrf
-                @method('PUT')
+            <!-- Título -->
+            <div class="mb-6">
+                <label for="title" class="block text-sm font-medium text-slate-400 mb-2">Título *</label>
+                <input type="text" id="title" name="title" required
+                       class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                       value="{{ old('title', $video->title) }}"
+                       placeholder="Título del video">
+                @error('title')
+                <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
 
-                <!-- Títol -->
-                <div>
-                    <label for="title" class="block text-lg font-semibold text-gray-300 mb-1">Títol</label>
-                    <input type="text" name="title" id="title" class="w-full p-3 border border-gray-600 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition @error('title') border-red-500 @enderror" placeholder="Introdueix el títol del vídeo" required value="{{ old('title', $video->title) }}">
-                    @error('title')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
-                </div>
+            <!-- Descripción -->
+            <div class="mb-6">
+                <label for="description" class="block text-sm font-medium text-slate-400 mb-2">Descripción *</label>
+                <textarea id="description" name="description" required
+                          class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                          rows="4" placeholder="Descripción del video">{{ old('description', $video->description) }}</textarea>
+                @error('description')
+                <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
 
-                <!-- Descripció -->
-                <div>
-                    <label for="description" class="block text-lg font-semibold text-gray-300 mb-1">Descripció</label>
-                    <textarea name="description" id="description" rows="4" class="w-full p-3 border border-gray-600 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition @error('description') border-red-500 @enderror" placeholder="Escriu una breu descripció..." required>{{ old('description', $video->description) }}</textarea>
-                    @error('description')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
-                </div>
+            <!-- URL -->
+            <div class="mb-6">
+                <label for="url" class="block text-sm font-medium text-slate-400 mb-2">URL del video *</label>
+                <input type="url" id="url" name="url" required
+                       class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                       value="{{ old('url', $video->url) }}"
+                       placeholder="URL del video">
+                @error('url')
+                <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
 
-                <!-- URL -->
-                <div>
-                    <label for="url" class="block text-lg font-semibold text-gray-300 mb-1">URL del Vídeo</label>
-                    <input type="url" name="url" id="url" class="w-full p-3 border border-gray-600 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition @error('url') border-red-500 @enderror" placeholder="Introdueix l'URL del vídeo" required value="{{ old('url', $video->url) }}">
-                    @error('url')
-                    <span class="text-red-500 text-sm">Aquesta URL ja existeix</span>
-                    @enderror
-                </div>
+            <!-- Serie -->
+            <div class="mb-6">
+                <label for="serie_id" class="block text-sm font-medium text-slate-400 mb-2">Serie</label>
+                <select id="serie_id" name="serie_id"
+                        class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white">
+                    <option value="">Sin serie</option>
+                    @foreach($series as $serie)
+                        <option value="{{ $serie->id }}" {{ old('serie_id', $video->serie_id) == $serie->id ? 'selected' : '' }}>
+                            {{ $serie->title }}
+                        </option>
+                    @endforeach
+                </select>
+                @error('serie_id')
+                <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
 
-                <!-- Botó de enviar -->
-                <button type="submit" class="w-full bg-green-500 text-white font-semibold text-lg py-3 rounded-md hover:bg-green-600 transition">
-                    Actualitzar Vídeo
+            <!-- Form Actions -->
+            <div class="flex justify-end space-x-4 pt-4 border-t border-slate-700">
+                <a href="{{ route('videos.manage.index') }}"
+                   class="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors">
+                    Cancelar
+                </a>
+                <button type="submit"
+                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center">
+                    <i class="fas fa-save mr-2"></i>
+                    Actualizar video
                 </button>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 @endsection

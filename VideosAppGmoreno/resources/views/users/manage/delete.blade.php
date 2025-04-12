@@ -1,34 +1,50 @@
 @extends('layouts.admin')
 
 @section('admin-content')
-    <div class="container mx-auto px-4 text-center">
-        <!-- Tabs -->
-        <div class="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-6 pb-2 mb-6">
-            <a href="{{ route('users.manage.index') }}" class="text-lg font-semibold text-gray-400 pb-2 inline-block text-center w-full hover:text-green-400 hover:border-green-400 hover:border-b-2 transition duration-200">Llista d'Usuaris</a>
-            <a href="{{ route('users.manage.create') }}" class="text-lg font-semibold text-gray-400 pb-2 inline-block text-center w-full hover:text-green-400 hover:border-green-400 hover:border-b-2 transition duration-200">Afegir Usuari</a>
-            <a href="{{ route('users.manage.delete', $user->id) }}" class="text-lg font-semibold text-red-400 border-b-2 pb-2 inline-block text-center w-full">Eliminar Usuari</a>
-        </div>
+    <div class="max-w-md mx-auto px-4 py-8">
+        <!-- Breadcrumbs -->
+        <nav class="flex mb-6" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{{ route('users.manage.index') }}" class="inline-flex items-center text-sm font-medium text-slate-400 hover:text-blue-400 transition-colors">
+                        <i class="fas fa-users mr-2"></i>
+                        Usuarios
+                    </a>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-xs text-slate-500 mx-2"></i>
+                        <span class="text-sm font-medium text-blue-400">Eliminar usuario</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
 
-        <!-- Contenidor del formulari -->
-        <div class="max-w-lg mx-auto bg-gray-800 p-8 rounded-lg shadow-lg">
-            <h2 class="text-3xl font-semibold text-teal-400 mb-6">Eliminar Usuari</h2>
+        <!-- Delete Confirmation -->
+        <div class="bg-slate-800 rounded-xl shadow-lg p-6 text-center">
+            <div class="w-16 h-16 mx-auto mb-4 bg-red-500 rounded-full flex items-center justify-center">
+                <i class="fas fa-exclamation text-white text-2xl"></i>
+            </div>
 
-            <p class="text-lg text-gray-300 mb-6">Estàs segur que vols eliminar l'usuari anomenat <strong>"{{ $user->name }}"</strong>?</p>
+            <h2 class="text-xl font-bold text-white mb-2">¿Eliminar usuario permanentemente?</h2>
+            <p class="text-slate-400 mb-6">Esta acción no se puede deshacer. Se eliminará el usuario "{{ $user->name }}" y todos sus datos asociados.</p>
 
-            <form action="{{ route('users.manage.destroy', $user->id) }}" method="POST" class="space-y-4">
-                @csrf
-                @method('DELETE')
+            <div class="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+                <a href="{{ route('users.manage.index') }}"
+                   class="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors">
+                    Cancelar
+                </a>
+                <form action="{{ route('users.manage.destroy', $user->id) }}" method="POST" class="inline">
+                    @csrf
+                    @method('DELETE')
 
-                <!-- Botó de eliminar -->
-                <button type="submit" class="w-full bg-red-500 text-white font-semibold text-lg py-3 rounded-md hover:bg-red-600 transition">
-                    Eliminar Usuari
-                </button>
-
-                <!-- Botó de cancel·lar -->
-                <button type="button" onclick="window.location='{{ route('users.manage.index') }}'" class="w-full bg-gray-500 text-white font-semibold text-lg py-3 rounded-md hover:bg-gray-600 transition">
-                    Cancel·lar
-                </button>
-            </form>
+                    <button type="submit"
+                            class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center">
+                        <i class="fas fa-trash-alt mr-2"></i>
+                        Sí, eliminar usuario
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 @endsection

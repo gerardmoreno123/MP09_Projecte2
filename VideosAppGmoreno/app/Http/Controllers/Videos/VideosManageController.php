@@ -1,9 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Videos;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Models\Serie;
 use App\Models\Video;
+use Illuminate\Http\Request;
 use Tests\Feature\Videos\VideosManageControllerTest;
 
 class VideosManageController extends Controller
@@ -13,7 +15,16 @@ class VideosManageController extends Controller
      */
     public function index(Request $request)
     {
-        $videos = Video::all();
+        $query = Video::query();
+
+        // Handle search
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where('title', 'like', '%' . $search . '%');
+        }
+
+        // With user and serie
+        $videos = $query->with(['user', 'serie'])->paginate(10);
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -29,7 +40,8 @@ class VideosManageController extends Controller
      */
     public function create()
     {
-        return view('videos.manage.create');
+        $series = Serie::All();
+        return view('videos.manage.create', compact('series'));
     }
 
     /**
@@ -42,6 +54,7 @@ class VideosManageController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'url' => 'required|string|unique:videos,url',
+            'serie_id' => 'nullable|exists:series,id',
         ]);
 
         // Obtener todos los datos del request
@@ -97,6 +110,7 @@ class VideosManageController extends Controller
     public function edit($id, Request $request)
     {
         $video = Video::findOrFail($id);
+        $series = Serie::All();
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -104,7 +118,7 @@ class VideosManageController extends Controller
             ], 200);
         }
 
-        return view('videos.manage.edit', compact('video'));
+        return view('videos.manage.edit', compact('video', 'series'));
     }
 
     /**

@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Multimedia;
 
+use App\Http\Controllers\Controller;
 use App\Models\Multimedia;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,11 +18,14 @@ class ApiMultimediaController extends Controller
 
     public function show($id)
     {
-        $multimedia = Multimedia::findOrFail($id);
+        $multimedia = Multimedia::with('user')->findOrFail($id);
 
-        $multimedia->user_id = $multimedia->user->name;
-
-        return response()->json(['data' => $multimedia]);
+        return response()->json([
+            'data' => [
+                'multimedia' => $multimedia,
+                'user_name' => $multimedia->user ? $multimedia->user->name : null,
+            ]
+        ]);
     }
 
     public function store(Request $request)

@@ -1,121 +1,136 @@
 @php
     $roleColors = [
-        'super-admin' => 'bg-red-500',
-        'video-manager' => 'bg-blue-500',
-        'user-manager' => 'bg-yellow-500',
-        'viewer' => 'bg-green-500',
+        'super-admin' => 'bg-red-500 text-white',
+        'video-manager' => 'bg-blue-500 text-white',
+        'user-manager' => 'bg-yellow-500 text-white',
+        'serie-manager' => 'bg-purple-500 text-white',
+        'viewer' => 'bg-green-500 text-white',
     ];
 @endphp
 
 @extends('layouts.admin')
 
 @section('admin-content')
-    <div class="container mx-auto px-4 text-center">
-        <!-- Tabs -->
-        <div class="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-6 pb-2 mb-6">
-            <a href="{{ route('users.manage.index') }}" class="text-lg font-semibold text-gray-400 pb-2 inline-block text-center w-full hover:text-green-400 hover:border-green-400 hover:border-b-2 transition duration-200">Llista d'Usuaris</a>
-            <a href="{{ route('users.manage.create') }}" class="text-lg font-semibold text-gray-400 pb-2 inline-block text-center w-full hover:text-green-400 hover:border-green-400 hover:border-b-2 transition duration-200">Afegir Usuari</a>
-            <a href="{{ route('users.manage.edit', $user->id) }}" class="text-lg font-semibold text-blue-400 border-b-2 pb-2 inline-block text-center w-full">Editar Usuari</a>
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Breadcrumbs -->
+        <nav class="flex mb-6" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{{ route('users.manage.index') }}" class="inline-flex items-center text-sm font-medium text-slate-400 hover:text-blue-400 transition-colors">
+                        <i class="fas fa-users mr-2"></i>
+                        Usuarios
+                    </a>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-xs text-slate-500 mx-2"></i>
+                        <span class="text-sm font-medium text-blue-400">Editar usuario</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Form Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-bold text-white">
+                <i class="fas fa-user-edit text-blue-400 mr-2"></i>
+                Editar usuario: {{ $user->name }}
+            </h1>
         </div>
 
-        <!-- Contenidor del formulari -->
-        <div class="max-w-lg mx-auto bg-gray-800 p-8 rounded-lg shadow-lg">
-            <h2 class="text-3xl font-semibold text-teal-400 mb-6">Editar Usuari</h2>
+        <!-- Form -->
+        <form action="{{ route('users.manage.update', $user->id) }}" method="POST" class="bg-slate-800 rounded-xl shadow-lg p-6" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
 
-            <form id="user-form" action="{{ route('users.manage.update', $user->id) }}" method="POST" class="space-y-4" enctype="multipart/form-data">
-                @csrf
-                @method('PUT')
+            <!-- Name -->
+            <div class="mb-6">
+                <label for="name" class="block text-sm font-medium text-slate-400 mb-2">Nombre *</label>
+                <input type="text" id="name" name="name" required
+                       class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                       value="{{ old('name', $user->name) }}"
+                       placeholder="Nombre completo del usuario">
+                @error('name')
+                <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
 
-                <!-- Nom -->
-                <div>
-                    <label for="name" class="block text-lg font-semibold text-gray-300 mb-1">Nom</label>
-                    <input type="text" name="name" id="name" class="w-full p-3 border border-gray-600 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition @error('name') border-red-500 @enderror" placeholder="Introdueix el nom de l'usuari" required value="{{ old('name', $user->name) }}">
-                    @error('name')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
-                </div>
+            <!-- Email -->
+            <div class="mb-6">
+                <label for="email" class="block text-sm font-medium text-slate-400 mb-2">Email *</label>
+                <input type="email" id="email" name="email" required
+                       class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                       value="{{ old('email', $user->email) }}"
+                       placeholder="Email del usuario">
+                @error('email')
+                <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
 
-                <!-- Email -->
-                <div>
-                    <label for="email" class="block text-lg font-semibold text-gray-300 mb-1">Email</label>
-                    <input type="email" name="email" id="email" class="w-full p-3 border border-gray-600 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition @error('email') border-red-500 @enderror" placeholder="Introdueix l'email de l'usuari" required value="{{ old('email', $user->email) }}">
-                    @error('email')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
-                </div>
+            <!-- Password -->
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium text-slate-400 mb-2">Nueva contraseña</label>
+                <input type="password" id="password" name="password"
+                       class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
+                       placeholder="Dejar en blanco para no cambiar">
+                @error('password')
+                <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
 
-                <!-- Contrasenya -->
-                <div>
-                    <label for="password" class="block text-lg font-semibold text-gray-300 mb-1">Contrasenya</label>
-                    <input type="password" name="password" id="password" class="w-full p-3 border border-gray-600 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition @error('password') border-red-500 @enderror" placeholder="Introdueix la contrasenya de l'usuari">
-                    @error('password')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
-                </div>
+            <!-- Profile Photo -->
+            <div class="mb-6">
+                <label for="profile_photo" class="block text-sm font-medium text-slate-400 mb-2">Foto de perfil</label>
+                <input type="file" id="profile_photo" name="profile_photo"
+                       class="w-full text-sm text-slate-400
+                              file:mr-4 file:py-2 file:px-4
+                              file:rounded-lg file:border-0
+                              file:text-sm file:font-medium
+                              file:bg-slate-700 file:text-white
+                              hover:file:bg-slate-600">
+                @error('profile_photo')
+                <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                @enderror
+                @if($user->profile_photo_path)
+                    <div class="mt-2 flex items-center">
+                        <span class="text-xs text-slate-400 mr-2">Foto actual:</span>
+                        <img src="{{ $user->profile_photo_url }}" alt="Foto actual" class="w-8 h-8 rounded-full">
+                    </div>
+                @endif
+            </div>
 
-                <!-- Foto de perfil -->
-                <div>
-                    <label for="profile_photo" class="block text-lg font-semibold text-gray-300 mb-1">Foto de perfil</label>
-                    <input type="file" name="profile_photo" id="profile_photo" class="w-full p-3 border border-gray-600 rounded-md bg-gray-700 text-white focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition @error('profile_photo') border-red-500 @enderror">
-                    @error('profile_photo')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
-                </div>
-
-                <!-- Rols -->
-                <div>
-                    <label for="roles" class="block text-lg font-semibold text-gray-300 mb-1">Rols</label>
-                    <div id="roles-container" class="flex flex-wrap gap-2">
-                        @foreach($roles as $role)
-                            <span class="role-option inline-block px-2 py-1 rounded-full text-white cursor-pointer {{ $roleColors[$role->name] ?? 'bg-gray-500' }} {{ !in_array($role->name, $user->roles->pluck('name')->toArray()) ? 'opacity-50' : '' }}" data-role="{{ $role->name }}">
+            <!-- Roles -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-slate-400 mb-2">Roles *</label>
+                <div class="flex flex-wrap gap-3">
+                    @foreach($roles as $role)
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" name="roles[]" value="{{ $role->name }}"
+                                   class="rounded border-slate-600 text-blue-500 focus:ring-blue-500"
+                                {{ $user->hasRole($role->name) || in_array($role->name, old('roles', [])) ? 'checked' : '' }}>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium {{ $roleColors[$role->name] ?? 'bg-gray-500 text-white' }}">
                                 {{ $role->name }}
                             </span>
-                        @endforeach
-                    </div>
-                    <input type="hidden" name="roles[]" id="roles-input" value="{{ implode(',', $user->roles->pluck('name')->toArray()) }}" required>
-                    @error('roles')
-                    <span class="text-red-500 text-sm">{{ $message }}</span>
-                    @enderror
-                    <div id="roles-error" class="text-red-500 text-sm hidden">Please select at least one role.</div>
+                        </label>
+                    @endforeach
                 </div>
+                @error('roles')
+                <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
 
-                <button type="submit" class="w-full bg-green-500 text-white font-semibold text-lg py-3 rounded-md hover:bg-green-600 transition">
-                    Actualitzar Usuari
+            <!-- Form Actions -->
+            <div class="flex justify-end space-x-4 pt-4 border-t border-slate-700">
+                <a href="{{ route('users.manage.index') }}"
+                   class="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors">
+                    Cancelar
+                </a>
+                <button type="submit"
+                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center">
+                    <i class="fas fa-save mr-2"></i>
+                    Actualizar usuario
                 </button>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const roleOptions = document.querySelectorAll('.role-option');
-            const rolesInput = document.getElementById('roles-input');
-            const rolesError = document.getElementById('roles-error');
-            const userForm = document.getElementById('user-form');
-            let selectedRoles = rolesInput.value.split(',');
-
-            roleOptions.forEach(option => {
-                option.addEventListener('click', function () {
-                    const role = this.getAttribute('data-role');
-                    if (selectedRoles.includes(role)) {
-                        selectedRoles = selectedRoles.filter(r => r !== role);
-                        this.classList.add('opacity-50');
-                    } else {
-                        selectedRoles.push(role);
-                        this.classList.remove('opacity-50');
-                    }
-                    rolesInput.value = selectedRoles;
-                });
-            });
-
-            userForm.addEventListener('submit', function (event) {
-                if (selectedRoles.length === 0) {
-                    event.preventDefault();
-                    rolesError.classList.remove('hidden');
-                } else {
-                    rolesError.classList.add('hidden');
-                }
-            });
-        });
-    </script>
 @endsection

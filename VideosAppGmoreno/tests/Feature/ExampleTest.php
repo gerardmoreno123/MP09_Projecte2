@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Helpers\DefaultVideosHelper;
+use App\Helpers\SerieHelper;
 use App\Models\Video;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -26,10 +28,12 @@ class ExampleTest extends TestCase
 
         $viewerRole = Role::create(['name' => 'viewer']);
         $videoManagerRole = Role::create(['name' => 'video-manager']);
+        $serieManagerRole = Role::create(['name' => 'serie-manager']);
         $superAdminRole = Role::create(['name' => 'super-admin']);
 
         $viewerRole->givePermissionTo('view-videos');
         $videoManagerRole->givePermissionTo(['view-videos', 'create-videos', 'edit-videos', 'delete-videos']);
+        $serieManagerRole->givePermissionTo(['view-videos', 'create-videos', 'edit-videos']);
         $superAdminRole->givePermissionTo(Permission::all());
     }
 
@@ -42,11 +46,22 @@ class ExampleTest extends TestCase
         $this->artisan('migrate');
 
         // Create default videos using the helper
+        SerieHelper::create_series();
         DefaultVideosHelper::create_default_videos();
 
         $response = $this->get('/');
 
         $response->assertStatus(200);
-        $response->assertViewHas('videos', Video::all());
+
+        // Verifica que la vista contiene la variable 'videos'
+        $response->assertViewHas('videos');
+
+        // Verifica que la variable es una instancia de paginator
+        $videos = $response->viewData('videos');
+        $this->assertInstanceOf(LengthAwarePaginator::class, $videos);
+
+        // Verifica que contiene al menos uno de los videos esperados
+        $this->assertGreaterThan(0, $videos->count());
     }
+
 }

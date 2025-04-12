@@ -6,8 +6,9 @@ use Carbon\Carbon;
 use Database\Factories\VideoFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Series; #No existeix encara
-use App\Helpers\VideoHelper;
+use App\Models\Serie; #No existeix encara
+use App\Helpers\CarbonHelper;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Video extends Model
 {
@@ -21,7 +22,7 @@ class Video extends Model
         'published_at',
         'previous_id',
         'next_id',
-        'series_id',
+        'serie_id',
         'user_id',
     ];
 
@@ -30,21 +31,27 @@ class Video extends Model
     ];
 
     // Relación con el usuario
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
     // Relación con el video anterior
-    public function previous()
+    public function previous(): BelongsTo
     {
         return $this->belongsTo(Video::class, 'previous_id');
     }
 
     // Relación con el video siguiente
-    public function next()
+    public function next(): BelongsTo
     {
         return $this->belongsTo(Video::class, 'next_id');
+    }
+
+    // Relación con la serie
+    public function serie(): BelongsTo
+    {
+        return $this->belongsTo(Serie::class, 'serie_id');
     }
 
     // Cuando eliminas un video, actualizas las relaciones de los videos anteriores y siguientes
@@ -69,7 +76,7 @@ class Video extends Model
      */
     public function getFormattedPublishedAtAttribute(): string|null
     {
-        return VideoHelper::getFormattedPublishedAtAttribute($this->published_at);
+        return CarbonHelper::getFormattedPublishedAtAttribute($this->published_at);
     }
 
     /**
@@ -79,7 +86,7 @@ class Video extends Model
      */
     public function getFormattedForHumansPublishedAtAttribute(): string|null
     {
-        return VideoHelper::getFormattedForHumansPublishedAtAttribute($this->published_at);
+        return CarbonHelper::getFormattedForHumansPublishedAtAttribute($this->published_at);
     }
 
     /**
@@ -90,7 +97,7 @@ class Video extends Model
      */
     public function getPublishedAtTimestampAttribute(): int
     {
-        return VideoHelper::getPublishedAtTimestampAttribute($this->published_at);
+        return CarbonHelper::getPublishedAtTimestampAttribute($this->published_at);
     }
 
 

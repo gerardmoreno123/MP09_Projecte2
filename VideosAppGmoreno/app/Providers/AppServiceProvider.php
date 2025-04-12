@@ -64,6 +64,23 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('delete-users', function (User $user) {
             return $user->hasPermissionTo('delete-users');
         });
+
+        // Gates for series CRUD operations
+        Gate::define('view-series', function (User $user) {
+            return $user->hasPermissionTo('view-series');
+        });
+
+        Gate::define('create-series', function (User $user) {
+            return $user->hasPermissionTo('create-series');
+        });
+
+        Gate::define('edit-series', function (User $user) {
+            return $user->hasPermissionTo('edit-series');
+        });
+
+        Gate::define('delete-series', function (User $user) {
+            return $user->hasPermissionTo('delete-series');
+        });
     }
 
     protected array $policies = [

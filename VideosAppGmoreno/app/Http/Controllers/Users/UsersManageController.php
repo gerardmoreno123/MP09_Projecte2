@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Users;
 
+use App\Http\Controllers\Controller;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Spatie\Permission\Models\Role;
 use Tests\Feature\Users\UsersManageControllerTest;
@@ -18,7 +18,19 @@ class UsersManageController extends Controller
      */
     public function index(): View
     {
-        $users = User::all();
+        $query = User::query();
+
+        // Handle search
+        if (request()->filled('search')) {
+            $search = request()->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%');
+            });
+        }
+
+        $users = $query->withCount('videos')->paginate(10);
+
         return view('users.manage.index', compact('users'));
     }
 
@@ -138,7 +150,16 @@ class UsersManageController extends Controller
     public function destroy(int $id): RedirectResponse
     {
         $user = User::findOrFail($id);
-        $user->forceDelete();
+
+        // Check if the user have videos before deleting
+        if ($user->videos()->count() > 0) {
+            $videos = $user->videos()->get();
+            foreach ($videos as $video) {
+                $video->delete();
+            }
+        }
+
+        $user->delete();
 
         return redirect()->route('users.manage.index')->with('success', 'User permanently deleted.');
     }

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Videos;
 
 use App\Helpers\DefaultVideosHelper;
+use App\Helpers\SerieHelper;
 use App\Helpers\UserHelpers;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -30,10 +31,12 @@ class VideosManageControllerTest extends TestCase
 
         $viewerRole = Role::create(['name' => 'viewer']);
         $videoManagerRole = Role::create(['name' => 'video-manager']);
+        $serieManagerRole = Role::create(['name' => 'serie-manager']);
         $superAdminRole = Role::create(['name' => 'super-admin']);
 
         $viewerRole->givePermissionTo('view-videos');
         $videoManagerRole->givePermissionTo(['view-videos', 'create-videos', 'edit-videos', 'delete-videos']);
+        $serieManagerRole->givePermissionTo(['view-videos', 'create-videos', 'edit-videos', 'delete-videos']);
         $superAdminRole->givePermissionTo(Permission::all());
     }
 
@@ -103,6 +106,7 @@ class VideosManageControllerTest extends TestCase
     public function test_user_with_permissions_can_destroy_videos()
     {
         $user = $this->loginAsVideoManager();
+        $serie = SerieHelper::create_series()->first();
         $video = DefaultVideosHelper::create_default_videos()->first();
         $response = $this->actingAs($user)->delete("/videos/manage/{$video->id}");
         $response->assertStatus(302);
@@ -112,6 +116,7 @@ class VideosManageControllerTest extends TestCase
     public function test_user_without_permissions_cannot_destroy_videos()
     {
         $user = $this->loginAsRegularUser();
+        $serie = SerieHelper::create_series()->first();
         $video = DefaultVideosHelper::create_default_videos()->first();
         $response = $this->actingAs($user)->delete("/videos/manage/{$video->id}");
         $response->assertStatus(403);
@@ -120,6 +125,7 @@ class VideosManageControllerTest extends TestCase
     public function test_user_with_permissions_can_see_edit_videos()
     {
         $user = $this->loginAsVideoManager();
+        $serie = SerieHelper::create_series()->first();
         $video = DefaultVideosHelper::create_default_videos()->first();
         $response = $this->actingAs($user)->get("/videos/manage/{$video->id}/edit");
         $response->assertStatus(200);
@@ -128,6 +134,7 @@ class VideosManageControllerTest extends TestCase
     public function test_user_without_permissions_cannot_see_edit_videos()
     {
         $user = $this->loginAsRegularUser();
+        $serie = SerieHelper::create_series()->first();
         $video = DefaultVideosHelper::create_default_videos()->first();
         $response = $this->actingAs($user)->get("/videos/manage/{$video->id}/edit");
         $response->assertStatus(403);
@@ -136,6 +143,7 @@ class VideosManageControllerTest extends TestCase
     public function test_user_with_permissions_can_update_videos()
     {
         $user = $this->loginAsVideoManager();
+        $serie = SerieHelper::create_series()->first();
         $video = DefaultVideosHelper::create_default_videos()->first();
         $response = $this->actingAs($user)->put("/videos/manage/{$video->id}", [
             'title' => 'Updated Video Title',
@@ -150,6 +158,7 @@ class VideosManageControllerTest extends TestCase
     public function test_user_without_permissions_cannot_update_videos()
     {
         $user = $this->loginAsRegularUser();
+        $serie = SerieHelper::create_series()->first();
         $video = DefaultVideosHelper::create_default_videos()->first();
         $response = $this->actingAs($user)->put("/videos/manage/{$video->id}", [
             'title' => 'Updated Video Title',
@@ -163,6 +172,7 @@ class VideosManageControllerTest extends TestCase
     public function test_user_with_permissions_can_manage_videos()
     {
         $user = $this->loginAsVideoManager();
+        $serie = SerieHelper::create_series()->first();
         DefaultVideosHelper::create_default_videos();
         $response = $this->actingAs($user)->get('/videos/manage');
         $response->assertStatus(200);

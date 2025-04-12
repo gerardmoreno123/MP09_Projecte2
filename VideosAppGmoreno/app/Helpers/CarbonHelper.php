@@ -4,7 +4,7 @@ namespace App\Helpers;
 
 use Carbon\Carbon;
 
-class VideoHelper
+class CarbonHelper
 {
     /**
      * Torna la data de publicació en format "13 de gener de 2025"
@@ -23,8 +23,6 @@ class VideoHelper
         // Retorna la fecha formateada
         return $carbonDate->isoFormat('D [de] MMMM [de] YYYY');
     }
-
-
 
     /**
      * Torna la data de publicació en format "fa 3 dies"
@@ -50,6 +48,23 @@ class VideoHelper
      * @return int
      */
     public static function getPublishedAtTimestampAttribute(Carbon|string|null $date): int
+    {
+        if ($date === null) {
+            return 0;
+        }
+
+        $carbonDate = $date instanceof Carbon ? $date : Carbon::parse($date);
+
+        return (int) $carbonDate->timestamp;
+    }
+
+    /**
+     * Torna la data de creació en format timestamp
+     *
+     * @param Carbon|string|null $date
+     * @return int
+     */
+    public static function getCreatedAtTimestampAttribute(Carbon|string|null $date): int
     {
         if ($date === null) {
             return 0;

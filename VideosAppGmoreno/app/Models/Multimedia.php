@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Multimedia extends Model
 {
@@ -24,7 +25,10 @@ class Multimedia extends Model
         'published_at' => 'datetime',
     ];
 
-    public function user()
+    /**
+     * @return BelongsTo<User, Multimedia>
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }

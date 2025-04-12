@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Controllers\ApiMultimediaController;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\MultimediaController;
-use App\Http\Controllers\UsersController;
-use App\Http\Controllers\VideosController;
-use App\Http\Controllers\VideosManageController;
+use App\Http\Controllers\Multimedia\ApiMultimediaController;
+use App\Http\Controllers\Multimedia\MultimediaController;
+use App\Http\Controllers\Users\UsersController;
+use App\Http\Controllers\Videos\VideosController;
+use App\Http\Controllers\Videos\VideosManageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

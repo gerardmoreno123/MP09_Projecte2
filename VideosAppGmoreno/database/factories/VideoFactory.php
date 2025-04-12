@@ -19,7 +19,8 @@ class VideoFactory extends Factory
             'published_at' => Carbon::now()->subDays(rand(1, 10)),
             'previous_id' => $this->faker->sentence,
             'next_id' => $this->faker->sentence,
-            'series_id' => $this->faker->randomDigitNotNull,
+            'serie_id' => $this->faker->randomDigitNotNull,
+            'user_id' => $this->faker->randomDigitNotNull,
         ];
     }
 }

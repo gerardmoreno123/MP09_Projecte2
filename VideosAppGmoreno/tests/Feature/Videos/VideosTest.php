@@ -3,6 +3,7 @@
 namespace Tests\Feature\Videos;
 
 use App\Helpers\DefaultVideosHelper;
+use App\Helpers\SerieHelper;
 use App\Helpers\UserHelpers;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,10 +28,12 @@ class VideosTest extends TestCase
 
         $viewerRole = Role::create(['name' => 'viewer']);
         $videoManagerRole = Role::create(['name' => 'video-manager']);
+        $serieManagerRole = Role::create(['name' => 'serie-manager']);
         $superAdminRole = Role::create(['name' => 'super-admin']);
 
         $viewerRole->givePermissionTo('view-videos');
         $videoManagerRole->givePermissionTo(['view-videos', 'create-videos', 'edit-videos', 'delete-videos']);
+        $serieManagerRole->givePermissionTo(['view-videos', 'create-videos', 'edit-videos', 'delete-videos']);
         $superAdminRole->givePermissionTo(Permission::all());
     }
 
@@ -39,6 +42,7 @@ class VideosTest extends TestCase
     public function test_users_can_view_videos()
     {
         $user = (new UserHelpers())->create_default_user();
+        $serie = SerieHelper::create_series()->first();
         $videos = (new DefaultVideosHelper())->create_default_videos();
 
         $video = $videos->first();
@@ -65,6 +69,7 @@ class VideosTest extends TestCase
         $user->removeRole('viewer');
         $user->revokePermissionTo('view-videos');
 
+        $serie = SerieHelper::create_series()->first();
         $videos = (new DefaultVideosHelper())->create_default_videos();
 
         $response = $this->actingAs($user)->get('/');
@@ -78,6 +83,7 @@ class VideosTest extends TestCase
     public function test_user_with_permissions_can_see_default_videos_page()
     {
         $user = (new UserHelpers())->create_video_manager_user();
+        $serie = SerieHelper::create_series()->first();
         $videos = (new DefaultVideosHelper())->create_default_videos();
 
         $response = $this->actingAs($user)->get('/');
@@ -90,6 +96,7 @@ class VideosTest extends TestCase
 
     public function test_not_logged_users_can_see_default_videos_page()
     {
+        $serie = SerieHelper::create_series()->first();
         $videos = (new DefaultVideosHelper())->create_default_videos();
 
         $response = $this->get('/');

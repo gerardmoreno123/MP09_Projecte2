@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Helpers\SerieHelper;
 use Illuminate\Database\Seeder;
 use App\Helpers\UserHelpers;
 use App\Helpers\DefaultVideosHelper;
@@ -27,8 +28,17 @@ class DatabaseSeeder extends Seeder
         $defaultManageVideosUser = $userHelpers->create_video_manager_user();
         $this->command->info("Default video manager created: {$defaultManageVideosUser->email}");
 
+        $defaultManageUsersUser = $userHelpers->create_user_manager_user();
+        $this->command->info("Default user manager created: {$defaultManageUsersUser->email}");
+
+        $defaultManageSeriesUser = $userHelpers->create_serie_manager_user();
+        $this->command->info("Default series manager created: {$defaultManageSeriesUser->email}");
+
         $defaultSuperAdmin = $userHelpers->create_superadmin_user();
         $this->command->info("Default super admin created: {$defaultSuperAdmin->email}");
+
+        $defaultSeries = SerieHelper::create_series();
+        $this->command->info("Series created: " . $defaultSeries->pluck('title')->join(', '));
 
         $defaultVideos = DefaultVideosHelper::create_default_videos();
         $this->command->info("Videos created: " . $defaultVideos->pluck('title')->join(', '));
@@ -46,6 +56,9 @@ class DatabaseSeeder extends Seeder
 
         $userManagerRole = Role::firstOrCreate(['name' => 'user-manager']);
         $userManagerRole->givePermissionTo(['view-users', 'create-users', 'edit-users', 'delete-users']);
+
+        $serieManagerRole = Role::firstOrCreate(['name' => 'serie-manager']);
+        $serieManagerRole->givePermissionTo(['view-series', 'create-series', 'edit-series', 'delete-series']);
 
         $superAdminRole = Role::firstOrCreate(['name' => 'super-admin']);
         $superAdminRole->givePermissionTo(Permission::all());

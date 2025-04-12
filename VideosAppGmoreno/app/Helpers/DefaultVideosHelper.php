@@ -32,7 +32,7 @@ class DefaultVideosHelper
             'published_at' => '2025-01-13 12:00:00',
             'previous_id' => null,
             'next_id' => null,
-            'series_id' => null,
+            'serie_id' => 1,
             'user_id' => $regular->id,
         ]);
 
@@ -43,7 +43,7 @@ class DefaultVideosHelper
             'published_at' => '2025-01-10 12:00:00',
             'previous_id' => null,
             'next_id' => null,
-            'series_id' => null,
+            'serie_id' => 1,
             'user_id' => $videoManager->id,
         ]);
 
@@ -54,7 +54,7 @@ class DefaultVideosHelper
             'published_at' => '2025-01-07 12:00:00',
             'previous_id' => null,
             'next_id' => null,
-            'series_id' => null,
+            'serie_id' => 1,
             'user_id' => $superAdmin->id,
         ]);
 

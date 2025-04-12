@@ -93,6 +93,46 @@ class UserHelpers
         return $user;
     }
 
+    public static function create_user_manager_user(): User
+    {
+        $existingUserManager = User::where('email', 'usersmanager@videosapp.com')->first();
+
+        if ($existingUserManager) {
+            return $existingUserManager;
+        }
+
+        $user = User::create([
+            'name' => 'User Manager',
+            'email' => 'usersmanager@videosapp.com',
+            'password' => Hash::make('123456789'),
+        ]);
+
+        self::add_personal_team($user);
+        $user->assignRole('user-manager');
+
+        return $user;
+    }
+
+    public static function create_serie_manager_user(): User
+    {
+        $existingSerieManager = User::where('email', 'seriesmanager@videosapp.com')->first();
+
+        if ($existingSerieManager) {
+            return $existingSerieManager;
+        }
+
+        $user = User::create([
+            'name' => 'Serie Manager',
+            'email' => 'seriesmanager@videosapp.com',
+            'password' => Hash::make('123456789'),
+        ]);
+
+        self::add_personal_team($user);
+        $user->assignRole('serie-manager');
+
+        return $user;
+    }
+
     public static function create_superadmin_user(): User
     {
         $existingSuperAdmin = User::where('email', 'superadmin@videosapp.com')->first();
@@ -140,6 +180,12 @@ class UserHelpers
             'create-users',
             'edit-users',
             'delete-users',
+
+            //CRUD permissions for series
+            'view-series',
+            'create-series',
+            'edit-series',
+            'delete-series',
         ];
 
         foreach ($permissions as $permission) {

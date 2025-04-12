@@ -8,6 +8,7 @@ use App\Models\Video;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Helpers\DefaultVideosHelper;
+use App\Helpers\SerieHelper;
 use App\Helpers\UserHelpers;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -29,10 +30,12 @@ class HelpersTest extends TestCase
 
         $viewerRole = Role::create(['name' => 'viewer']);
         $videoManagerRole = Role::create(['name' => 'video-manager']);
+        $serieManagerRole = Role::create(['name' => 'serie-manager']);
         $superAdminRole = Role::create(['name' => 'super-admin']);
 
         $viewerRole->givePermissionTo('view-videos');
         $videoManagerRole->givePermissionTo(['view-videos', 'create-videos', 'edit-videos', 'delete-videos']);
+        $serieManagerRole->givePermissionTo(['view-videos', 'create-videos', 'edit-videos']);
         $superAdminRole->givePermissionTo(Permission::all());
     }
 
@@ -68,6 +71,7 @@ class HelpersTest extends TestCase
     public function test_create_default_videos()
     {
         // Llama a la función helper
+        $series = (new SerieHelper())->create_series();
         $videos = (new DefaultVideosHelper())->create_default_videos();
 
         // Verifica que se han creado tres instancias de Video

@@ -1,18 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Multimedia;
 
+use App\Http\Controllers\Controller;
 use App\Models\Multimedia;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use App\Models\Video;
-use Tests\Unit\VideosTest as UnitVideosTest;
-use Tests\Feature\Videos\VideosTest as FeatureVideosTest;
 
 class MultimediaController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Display a listing of the resource.
+     *
+     * @param Request $request
+     * @return View|JsonResponse
+     */
+    public function index(Request $request): View|JsonResponse
     {
         $multimedia = Multimedia::all();
 
@@ -22,9 +26,15 @@ class MultimediaController extends Controller
             ], 200);
         }
 
+        /** @phpstan-ignore argument.type */
         return view('multimedia.index', compact('multimedia'));
     }
 
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return View|JsonResponse
+     */
     public function show(int $id): View|JsonResponse
     {
         $multimedia_file = Multimedia::find($id);
@@ -39,6 +49,7 @@ class MultimediaController extends Controller
             ], 200);
         }
 
+        /** @phpstan-ignore argument.type */
         return view('multimedia.show', compact('multimedia_file'));
     }
 }

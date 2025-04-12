@@ -6,115 +6,242 @@
     <title>VídeosApp Gmoreno</title>
     <script src="{{ asset('js/app.js') }}"></script>
     @vite('resources/css/app.css')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --secondary: #10b981;
+            --secondary-hover: #059669;
+            --dark: #1e293b;
+            --darker: #0f172a;
+            --light: #f8fafc;
+            --card-bg: #334155;
+        }
+
         body {
-            background-color: #1a202c; /* Tailwind's bg-gray-900 */
-            color: #fff; /* Tailwind's text-white */
+            background-color: var(--darker);
+            color: var(--light);
+            font-family: 'Inter', sans-serif;
         }
-        .btn-green {
-            background-color: #38a169; /* Tailwind's green-500 */
-            color: #fff;
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
-        .btn-green:hover {
-            background-color: #2f855a; /* Tailwind's green-600 */
+
+        .card-hover {
+            transition: all 0.3s ease;
+            transform: translateY(0);
         }
-        .btn-orange {
-            background-color: #ed8936; /* Tailwind's orange-500 */
-            color: #fff;
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
         }
-        .btn-orange:hover {
-            background-color: #dd6b20; /* Tailwind's orange-600 */
+
+        .video-thumbnail {
+            transition: transform 0.3s ease;
+        }
+
+        .video-thumbnail:hover {
+            transform: scale(1.03);
+        }
+
+        .play-icon {
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .video-container:hover .play-icon {
+            opacity: 1;
+            transform: scale(1.2);
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white flex flex-col min-h-screen">
+<body class="min-h-screen flex flex-col">
 
 <!-- Header -->
-<header class="bg-gray-800 text-white py-4 shadow-lg">
-    <div class="container mx-auto px-4 sm:px-6 flex justify-between items-center">
-        <a href="{{ route('videos.index') }}" class="text-white">
-            <h1 class="text-3xl font-semibold">VídeosApp Gmoreno</h1>
+<header class="bg-gradient-to-r from-slate-900 to-slate-800 shadow-xl sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <!-- Logo/Brand -->
+        <a href="{{ route('videos.index') }}" class="flex items-center space-x-2">
+            <i class="fas fa-play-circle text-3xl text-blue-400"></i>
+            <h1 class="text-2xl font-bold gradient-text">VídeosApp</h1>
         </a>
 
-        <!-- Navigation Menu -->
-        <nav class="hidden md:flex space-x-6">
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center space-x-6">
             @guest
-                <a href="{{ route('login') }}" class="text-white hover:text-green-400 transition-colors">Iniciar sesión</a>
-                <a href="{{ route('register') }}" class="text-white hover:text-green-400 transition-colors">Registrarse</a>
+                <a href="{{ route('login') }}" class="text-slate-200 hover:text-blue-400 transition-colors font-medium flex items-center space-x-1">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Iniciar sesión</span>
+                </a>
+                <a href="{{ route('register') }}" class="text-slate-200 hover:text-emerald-400 transition-colors font-medium flex items-center space-x-1">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Registrarse</span>
+                </a>
             @else
-                <span class="text-white">Hola, {{ Auth::user()->name }}</span>
+                <div class="flex items-center space-x-4">
+                    <div class="relative group">
+                        <!-- Contenedor que agrupa botón y menú para mantener el hover -->
+                        <div class="inline-block">
+                            <button class="flex items-center space-x-2 focus:outline-none">
+                                <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+                                    {{ substr(Auth::user()->name, 0, 1) }}
+                                </div>
+                                <span class="text-slate-200">{{ Auth::user()->name }}</span>
+                                <i class="fas fa-chevron-down text-xs text-slate-400"></i>
+                            </button>
 
-                @if(auth())
-                    <a href="{{ route('users.index') }}" class="hover:text-orange-600 transition-colors">Usuarios</a>
-                @endif
+                            <!-- Menú desplegable - Añadido padding-top en el contenedor padre -->
+                            <div class="absolute right-0 pt-2 w-56 z-50">
+                                <div class="bg-slate-800 rounded-md shadow-lg py-1 hidden group-hover:block">
+                                    @if(auth())
+                                        <a href="{{ route('videos.index') }}" class="block px-4 py-2 text-slate-200 hover:bg-slate-700 transition-colors flex items-center space-x-2">
+                                            <i class="fas fa-video text-blue-400"></i>
+                                            <span>Videos</span>
+                                        </a>
+                                        <a href="{{ route('series.index') }}" class="block px-4 py-2 text-slate-200 hover:bg-slate-700 transition-colors flex items-center space-x-2">
+                                            <i class="fas fa-film text-blue-400"></i>
+                                            <span>Series</span>
+                                        </a>
+                                        <a href="{{ route('users.index') }}" class="block px-4 py-2 text-slate-200 hover:bg-slate-700 transition-colors flex items-center space-x-2">
+                                            <i class="fas fa-users text-blue-400"></i>
+                                            <span>Usuarios</span>
+                                        </a>
+                                    @endif
 
-                @if(auth()->user()->hasAnyRole('video-manager', 'super-admin'))
-                    <a href="{{ route('videos.manage.index') }}" class="hover:text-orange-600 transition-colors">CRUDS</a>
-                @endif
+                                    @if(auth()->user()->hasAnyRole('video-manager', 'serie-manager', 'user-manager', 'super-admin'))
+                                        <a href="{{ route('dashboard.index') }}" class="block px-4 py-2 text-slate-200 hover:bg-slate-700 transition-colors flex items-center space-x-2">
+                                            <i class="fas fa-tools text-emerald-400"></i>
+                                            <span>CRUDS</span>
+                                        </a>
+                                    @endif
 
-                <form method="POST" action="{{ route('logout') }}" class="inline">
-                    @csrf
-                    <button type="submit" class="text-white hover:text-green-400 transition-colors">Cerrar sesión</button>
-                </form>
+                                     <!-- Divider, profile and logout -->
+                                    <div class="border-t border-slate-700 my-1"></div>
+
+                                    <a href="{{ route('users.show', Auth::user()->id) }}" class="block px-4 py-2 text-slate-200 hover:bg-slate-700 transition-colors flex items-center space-x-2">
+                                        <i class="fas fa-user text-blue-400"></i>
+                                        <span>Perfil</span>
+                                    </a>
+
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="w-full text-left px-4 py-2 text-slate-200 hover:bg-slate-700 transition-colors flex items-center space-x-2">
+                                            <i class="fas fa-sign-out-alt text-red-400"></i>
+                                            <span>Cerrar sesión</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             @endguest
         </nav>
 
-        <!-- Hamburger Menu -->
-        <div class="md:hidden">
-            <button id="hamburger-btn" class="text-white focus:outline-none">
-                <svg id="icon-menu" class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2"
-                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M4 6h16M4 12h16m-7 6h7"/>
-                </svg>
-            </button>
-        </div>
+        <!-- Mobile Menu Button -->
+        <button id="mobile-menu-button" class="md:hidden text-slate-200 focus:outline-none">
+            <i class="fas fa-bars text-2xl"></i>
+        </button>
     </div>
 
-
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden">
-        <nav class="px-2 pt-2 pb-4 space-y-1 sm:px-3">
-            @guest
-                <a href="{{ route('login') }}" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:text-green-400 transition-colors">Iniciar sesión</a>
-                <a href="{{ route('register') }}" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:text-green-400 transition-colors">Registrarse</a>
-            @else
-                <span class="block px-3 py-2 rounded-md text-base font-medium text-white">Hola, {{ Auth::user()->name }}</span>
+    <div id="mobile-menu" class="hidden md:hidden bg-slate-800 px-4 py-3">
+        @guest
+            <a href="{{ route('login') }}" class="block py-2 text-slate-200 hover:text-blue-400 transition-colors font-medium flex items-center space-x-3">
+                <i class="fas fa-sign-in-alt w-6 text-center"></i>
+                <span>Iniciar sesión</span>
+            </a>
+            <a href="{{ route('register') }}" class="block py-2 text-slate-200 hover:text-emerald-400 transition-colors font-medium flex items-center space-x-3">
+                <i class="fas fa-user-plus w-6 text-center"></i>
+                <span>Registrarse</span>
+            </a>
+        @else
+            <div class="py-2 font-medium flex items-center space-x-3">
+                <i class="fas fa-user w-6 text-center text-slate-200"></i>
+                <span>Hola, {{ Auth::user()->name }}</span>
+            </div>
 
-                @if(auth())
-                    <a href="{{ route('users.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:text-orange-600 transition-colors">Usuarios</a>
-                @endif
+            @if(auth())
+                <a href="{{ route('videos.index') }}" class="block px-4 py-2 text-slate-200 hover:bg-slate-700 transition-colors flex items-center space-x-2">
+                    <i class="fas fa-video text-blue-400"></i>
+                    <span>Videos</span>
+                </a>
+                <a href="{{ route('series.index') }}" class="block px-4 py-2 text-slate-200 hover:bg-slate-700 transition-colors flex items-center space-x-2">
+                    <i class="fas fa-film text-blue-400"></i>
+                    <span>Series</span>
+                </a>
+                <a href="{{ route('users.index') }}" class="block px-4 py-2 text-slate-200 hover:bg-slate-700 transition-colors flex items-center space-x-2">
+                    <i class="fas fa-users text-blue-400"></i>
+                    <span>Usuarios</span>
+                </a>
+            @endif
 
-                @if(auth()->user()->hasAnyRole('video-manager', 'user-manager', 'super-admin'))
-                    <a href="{{ route('videos.manage.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-white hover:text-orange-600 transition-colors">CRUDS</a>
-                @endif
+            @if(auth()->user()->hasAnyRole('video-manager', 'serie-manager', 'user-manager', 'super-admin'))
+                <a href="{{ route('dashboard.index') }}" class="block py-2 text-slate-200 hover:text-emerald-400 transition-colors font-medium flex items-center space-x-3">
+                    <i class="fas fa-tools w-6 text-center"></i>
+                    <span>CRUDS</span>
+                </a>
+            @endif
 
-                <form method="POST" action="{{ route('logout') }}" class="block">
-                    @csrf
-                    <button type="submit" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:text-green-400 transition-colors">Cerrar sesión</button>
-                </form>
-            @endguest
-        </nav>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="w-full text-left py-2 text-slate-200 hover:text-red-400 transition-colors font-medium flex items-center space-x-3">
+                    <i class="fas fa-sign-out-alt w-6 text-center"></i>
+                    <span>Cerrar sesión</span>
+                </button>
+            </form>
+        @endguest
     </div>
 </header>
 
 <!-- Main Content -->
-<main class="flex-grow bg-gray-900">
-    <div class="container mx-auto px-4 sm:px-6 py-8">
+<main class="flex-grow">
+    <div class="container mx-auto px-4 py-8">
         @yield('content')
     </div>
 </main>
 
 <!-- Footer -->
-<footer class="bg-gray-800 text-center text-white py-4 mt-6">
-    <div class="text-center p-3">
-        &copy; 2025 <a class="text-green-400 hover:text-green-600 transition-colors" href="https://github.com/gerardmoreno123" target="_blank">Gmoreno</a>
+<footer class="bg-gradient-to-r from-slate-900 to-slate-800 py-6 border-t border-slate-700 sticky z-50">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <a href="{{ route('videos.index') }}" class="flex items-center space-x-2">
+                    <i class="fas fa-play-circle text-2xl text-blue-400"></i>
+                    <span class="text-xl font-bold gradient-text">VídeosApp</span>
+                </a>
+                <p class="text-slate-400 text-sm mt-1">Tu plataforma de videos favorita</p>
+            </div>
+
+            <div class="flex space-x-4">
+                <a href="#" class="text-slate-400 hover:text-blue-400 transition-colors">
+                    <i class="fab fa-twitter text-xl"></i>
+                </a>
+                <a href="#" class="text-slate-400 hover:text-pink-500 transition-colors">
+                    <i class="fab fa-instagram text-xl"></i>
+                </a>
+                <a href="https://github.com/gerardmoreno123" target="_blank" class="text-slate-400 hover:text-slate-200 transition-colors">
+                    <i class="fab fa-github text-xl"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="mt-6 pt-6 border-t border-slate-700 text-center text-slate-500 text-sm">
+            &copy; 2025 <a href="https://github.com/gerardmoreno123" target="_blank" class="text-emerald-400 hover:text-emerald-300 transition-colors">Gmoreno</a>. Todos los derechos reservados.
+        </div>
     </div>
 </footer>
 
 <script>
-    document.getElementById('hamburger-btn').addEventListener('click', function() {
-        var menu = document.getElementById('mobile-menu');
+    // Mobile menu toggle
+    document.getElementById('mobile-menu-button').addEventListener('click', function() {
+        const menu = document.getElementById('mobile-menu');
         menu.classList.toggle('hidden');
     });
 </script>

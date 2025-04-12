@@ -122,3 +122,115 @@ Aquest projecte és una plataforma per gestionar i visualitzar vídeos, on els u
 
 
 ---
+
+## Sprint 6: Implementació de Sèries i Millores al CRUD de Videos
+
+- **Correcció d'errors del Sprint 5**:
+    - Solucionats errors relacionats amb la gestió d'usuaris i el dashboard, com la falta de `user_id` en algunes vistes i tests.
+    - Revisats i corregits tests de sprints anteriors afectats per modificacions (per exemple, `VideosManageControllerTest` i `UserTest`), assegurant que no fallin a causa de canvis en `user_id` o permisos.
+
+- **Modificació dels vídeos per assignar-los a sèries**:
+    - Actualitzada la migració de `videos` per afegir el camp `serie_id` com a clau forana nullable.
+    - Modificat el model `Video` per incloure la relació `belongsTo` amb `Serie`.
+    - Actualitzat el `VideosController` i `VideosManageController` per permetre l'assignació de sèries als vídeos durant la creació i edició.
+    - Afegits camps per seleccionar sèries a les vistes `create.blade.php` i `edit.blade.php` de vídeos.
+
+- **CRUD de vídeos per a usuaris regulars**:
+    - Modificat el `VideosController` per afegir les funcions `create`, `store`, `edit`, `update`, i `destroy`, accessibles per a usuaris amb rol `viewer`.
+    - Afegits botons de CRUD (crear, editar, eliminar) a la vista `resources/views/videos/index.blade.php`, visibles només per a usuaris loguejats amb permisos.
+    - Creats permisos `create-videos`, `edit-videos`, i `delete-videos` a `helpers` i assignats al rol `viewer`.
+
+- **Creació de la migració per a sèries**:
+    - Creada una migració per a la taula `series` amb els camps: `id`, `title` (string), `description` (text), `image` (string, nullable), `user_name` (string), `user_photo_url` (string, nullable), `published_at` (timestamp, nullable), `created_at`, `updated_at`.
+
+- **Creació del model `Serie`**:
+    - Implementat el model `Serie` amb:
+        - Funció `testedBy()` per indicar la classe de tests associada (`SeriesManageControllerTest`).
+        - Relació `videos()` per establir una relació 1:N amb `Video` (`hasMany`).
+        - Accessors:
+            - `getFormattedCreatedAtAttribute`: retorna la data de creació formatada (per exemple, "DD-MM-YYYY").
+            - `getFormattedForHumansCreatedAtAttribute`: retorna la data en format humà (per exemple, "fa 2 dies").
+            - `getCreatedAtTimestampAttribute`: retorna el timestamp de creació.
+
+- **Relació 1:N al model `Video`**:
+    - Afegida la relació `belongsTo` al model `Video` per connectar amb `Serie` mitjançant `serie_id`.
+
+- **Creació del `SeriesManageController`**:
+    - Implementades les funcions:
+        - `testedBy()`: retorna la classe de tests associada.
+        - `index()`: mostra la llista de sèries amb cerca i paginació.
+        - `store()`: crea una nova sèrie amb validació de camps.
+        - `edit()`: mostra el formulari d'edició d'una sèrie.
+        - `update()`: actualitza una sèrie existent.
+        - `delete()`: mostra la confirmació d'eliminació.
+        - `destroy()`: elimina una sèrie i desassigna els vídeos associats.
+
+- **Creació del `SeriesController`**:
+    - Implementades les funcions:
+        - `index()`: mostra totes les sèries amb opció de cerca i paginació.
+        - `show()`: mostra els detalls d'una sèrie i els seus vídeos associats.
+
+- **Creació de la funció `create_series()` a helpers**:
+    - Afegida la funció `create_series()` al fitxer `helpers` per crear 3 sèries per defecte al `DatabaseSeeder`.
+
+- **Creació de vistes per al CRUD de sèries**:
+    - Creades les vistes amb accés restringit als rols `super-admin` i `serie-manager`:
+        - `resources/views/series/manage/index.blade.php`: llista les sèries amb taula i cerca.
+        - `resources/views/series/manage/create.blade.php`: formulari de creació amb atributs `data-qa` per facilitar tests.
+        - `resources/views/series/manage/edit.blade.php`: formulari d'edició amb taula de dades.
+        - `resources/views/series/manage/delete.blade.php`: confirmació d'eliminació, amb opció de desassignar vídeos (posant `serie_id` a `null`) en lloc d'eliminar-los.
+
+- **Modificacions a vistes existents**:
+    - **Vista `index.blade.php` (`series/manage`)**:
+        - Afegida una taula per mostrar les sèries amb columnes per a `title`, `description`, `user_name`, i accions (editar, eliminar).
+    - **Vista `create.blade.php` (`series/manage`)**:
+        - Inclòs un formulari amb camps per a `title`, `description`, `image`, `user_name`, `user_photo_url`, `published_at`, usant atributs `data-qa` (per exemple, `data-qa="series-title-input"`).
+    - **Vista `edit.blade.php` (`series/manage`)**:
+        - Afegida una taula per mostrar i editar les dades de la sèrie.
+    - **Vista `delete.blade.php` (`series/manage`)**:
+        - Afegida una confirmació d'eliminació amb missatge sobre els vídeos associats i opció de desassignació.
+
+- **Creació de la vista `series/index.blade.php`**:
+    - Creada `resources/views/series/index.blade.php` per mostrar totes les sèries amb:
+        - Funcionalitat de cerca per `title` o `description`.
+        - Llista de sèries amb enllaços a la vista `show` per veure els vídeos associats.
+        - Paginació per navegar entre pàgines de resultats.
+
+- **Creació de permisos per a sèries**:
+    - Afegits permisos a `helpers`: `view-series`, `create-series`, `edit-series`, `delete-series`.
+    - Assignats automàticament als usuaris amb rol `super-admin` i `serie-manager` al `DatabaseSeeder`.
+
+- **Creació de tests**:
+    - **A `test/Unit/SerieTest`**:
+        - Funció `test_serie_have_videos()`: verifica que una sèrie pot tenir vídeos associats mitjançant la relació 1:N.
+    - **A `test/Feature/SeriesManageControllerTest`**:
+        - Mètodes auxiliars: `loginAsVideoManager`, `loginAsSuperAdmin`, `loginAsRegularUser`.
+        - Tests de permisos:
+            - `test_user_with_permissions_can_see_add_series`: `serie-manager` pot veure el formulari de creació.
+            - `test_user_without_series_manage_create_cannot_see_add_series`: `viewer` rep error 403.
+            - `test_user_with_permissions_can_store_series`: `serie-manager` pot crear sèries.
+            - `test_user_without_permissions_cannot_store_series`: `viewer` no pot crear sèries.
+            - `test_user_with_permissions_can_destroy_series`: `serie-manager` pot eliminar sèries.
+            - `test_user_without_permissions_cannot_destroy_series`: `viewer` no pot eliminar sèries.
+            - `test_user_with_permissions_can_see_edit_series`: `serie-manager` pot veure el formulari d'edició.
+            - `test_user_without_permissions_cannot_see_edit_series`: `viewer` rep error 403.
+            - `test_user_with_permissions_can_update_series`: `serie-manager` pot actualitzar sèries.
+            - `test_user_without_permissions_cannot_update_series`: `viewer` no pot actualitzar sèries.
+            - `test_user_with_permissions_can_manage_series`: `serie-manager` pot accedir a la gestió.
+            - `test_regular_users_cannot_manage_series`: `viewer` rep error 403.
+            - `test_guest_users_cannot_manage_series`: usuaris no loguejats són redirigits al login.
+            - `test_seriemanagers_can_manage_series`: `serie-manager` pot accedir a la gestió.
+            - `test_superadmins_can_manage_series`: `super-admin` pot accedir a la gestió.
+        - Corregits errors en els tests per usar la convención `test_` de Laravel 11 i ajustats per usar `loginAsSerieManager` en lloc de `loginAsSuperAdmin` per als tests `with_permissions`.
+
+- **Creació de rutes per a sèries**:
+    - Afegides rutes a `routes/web.php`:
+        - `series/manage` per al CRUD (`index`, `create`, `store`, `show`, `edit`, `update`, `destroy`), protegides amb middleware `auth` i `role:super-admin|serie-manager`.
+        - `series` per a `index` i `show`, accessibles només per a usuaris loguejats amb middleware `auth`.
+    - Totes les rutes suporten navegació amb paginació.
+
+- **Navegació entre pàgines**:
+    - Implementada paginació a les vistes `series/index.blade.php` i `series/manage/index.blade.php` utilitzant el paginador de Laravel.
+    - Afegits enllaços de navegació al **navbar** per accedir a sèries i vídeos, visibles només per a usuaris loguejats.
+
+--- 

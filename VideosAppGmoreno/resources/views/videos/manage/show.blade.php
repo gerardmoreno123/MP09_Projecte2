@@ -1,46 +1,129 @@
 @extends('layouts.admin')
 
 @section('admin-content')
-    <div class="container mx-auto px-4 text-center">
-        <!-- Tabs -->
-        <div class="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-6 pb-2 mb-6">
-            <a href="{{ route('videos.manage.index') }}" class="text-lg font-semibold text-gray-400 pb-2 inline-block text-center w-full hover:text-green-400 hover:border-green-400 hover:border-b-2 transition duration-200">Llista de Vídeos</a>
-            <a href="{{ route('videos.manage.create') }}" class="text-lg font-semibold text-gray-400 pb-2 inline-block text-center w-full hover:text-green-400 hover:border-green-400 hover:border-b-2 transition duration-200">Afegir Vídeo</a>
-            <a href="{{ route('videos.manage.show', $video->id) }}" class="text-lg font-semibold text-green-400 border-b-2 pb-2 inline-block text-center w-full">Veure dades del vídeo</a>
-        </div>
-
-        <!-- Detalls del Video -->
-        <div class="flex justify-center space-x-6 pb-2 mb-6">
-            <div class="flex flex-col sm:flex-row w-full gap-2">
-                <!-- Informació del Video en una Card -->
-                <div class="text-left w-full sm:w-1/2 bg-gray-800 p-6 rounded-lg shadow-lg flex flex-col space-y-4 h-full mx-auto">
-                    <h2 class="w-full text-3xl text-teal-400 font-semibold">Títol: {{ $video->title }}</h2>
-                    <p class="text-lg text-gray-400">Publicat el: {{ $video->published_at ? $video->published_at->format('d/m/Y') : 'No publicat' }}</p>
-                    <p class="text-lg text-gray-400">Publicat per: {{ $video->user->name }}</p>
-                    <div class="w-full">
-                        <h3 class="text-2xl text-teal-400 font-semibold">Descripció</h3>
-                        <p class="text-lg text-gray-300">{{ $video->description ?? 'No disponible' }}</p>
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Breadcrumbs -->
+        <nav class="flex mb-6" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{{ route('videos.manage.index') }}" class="inline-flex items-center text-sm font-medium text-slate-400 hover:text-blue-400 transition-colors">
+                        <i class="fas fa-video mr-2"></i>
+                        Videos
+                    </a>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-xs text-slate-500 mx-2"></i>
+                        <span class="text-sm font-medium text-blue-400">{{ Str::limit($video->title, 30) }}</span>
                     </div>
+                </li>
+            </ol>
+        </nav>
 
-                    <!-- URL del vídeo guardada a la base de dades -->
-                    <div class="w-full">
-                        <h3 class="text-2xl text-teal-400 font-semibold">URL</h3>
-                        <p class="text-lg text-gray-300 break-words">{{ $video->url }}</p>
-                    </div>
-
-                    <!-- URL del vídeo a la APP -->
-                    <div class="w-full">
-                        <h3 class="text-2xl text-teal-400 font-semibold">URL APP</h3>
-                        <a href="{{ route('videos.show', ['video' => $video->id]) }}" class="text-blue-500 hover:underline" target="_blank">Veure vídeo</a>
-                    </div>
-
-                    <!-- Contenidor flex per als botons -->
-                    <div class="flex mt-auto justify-end space-x-4 w-full">
-                        <a href="{{ route('videos.manage.edit', $video) }}" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-500 transition duration-200">Editar</a>
-                        <a href="{{ route('videos.manage.delete', $video) }}" class="bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-500 transition duration-200">Eliminar</a>
+        <!-- Video Header -->
+        <div class="bg-slate-800 rounded-xl shadow-xl overflow-hidden mb-8">
+            <div class="p-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                    <h1 class="text-3xl font-bold text-white">{{ $video->title }}</h1>
+                    <div class="flex space-x-3 mt-4 md:mt-0">
+                        <a href="{{ route('videos.manage.edit', $video->id) }}"
+                           class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center">
+                            <i class="fas fa-edit mr-2"></i> Editar
+                        </a>
+                        <a href="{{ route('videos.manage.delete', $video->id) }}"
+                           class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors flex items-center">
+                            <i class="fas fa-trash-alt mr-2"></i> Eliminar
+                        </a>
                     </div>
                 </div>
+
+                <!-- Video Info -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-slate-700/50 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium text-slate-400 mb-2">Fecha de publicación</h3>
+                        <p class="text-white">{{ $video->published_at ? $video->published_at->format('d/m/Y H:i') : 'No publicado' }}</p>
+                    </div>
+                    <div class="bg-slate-700/50 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium text-slate-400 mb-2">Serie</h3>
+                        <p class="text-white">{{ $video->serie ? $video->serie->title : 'Sin serie' }}</p>
+                    </div>
+                    <div class="bg-slate-700/50 p-4 rounded-lg">
+                        <h3 class="text-sm font-medium text-slate-400 mb-2">Última actualización</h3>
+                        <p class="text-white">{{ $video->updated_at->format('d/m/Y H:i') }}</p>
+                    </div>
+                </div>
+
+                <!-- Author Info -->
+                <div class="bg-slate-700/50 p-4 rounded-lg mb-6">
+                    <h3 class="text-sm font-medium text-slate-400 mb-2">Creador</h3>
+                    <div class="flex items-center space-x-3">
+                        @if($video->user->profile_photo_path)
+                            <img src="{{ $video->user->profile_photo_url }}" alt="{{ $video->user->name }}" class="w-10 h-10 rounded-full">
+                        @else
+                            <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white">
+                                {{ substr($video->user->name, 0, 1) }}
+                            </div>
+                        @endif
+                        <span class="text-white">{{ $video->user->name }}</span>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                @if($video->description)
+                    <div class="bg-slate-700/50 p-4 rounded-lg mb-6">
+                        <h3 class="text-sm font-medium text-slate-400 mb-2">Descripción</h3>
+                        <p class="text-white whitespace-pre-line">{{ $video->description }}</p>
+                    </div>
+                @endif
+
+                <!-- URL -->
+                <div class="bg-slate-700/50 p-4 rounded-lg mb-6">
+                    <h3 class="text-sm font-medium text-slate-400 mb-2">URL</h3>
+                    <p class="text-white break-words">
+                        <a href="{{ $video->url }}" class="text-blue-400 hover:underline" target="_blank">{{ $video->url }}</a>
+                    </p>
+                </div>
+
+                <!-- URL APP -->
+                <div class="bg-slate-700/50 p-4 rounded-lg mb-6">
+                    <h3 class="text-sm font-medium text-slate-400 mb-2">URL en la APP</h3>
+                    <p class="text-white">
+                        <a href="{{ route('videos.show', $video->id) }}" class="text-blue-400 hover:underline" target="_blank">Ver video</a>
+                    </p>
+                </div>
+
+                <!-- Video Preview -->
+                <div class="bg-slate-700/50 p-4 rounded-lg">
+                    <h3 class="text-sm font-medium text-slate-400 mb-2">Vista previa</h3>
+                    @php
+                        preg_match('/(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/', $video->url, $matches);
+                        $videoId = $matches[1] ?? null;
+                    @endphp
+
+                    @if($videoId)
+                        <div class="relative aspect-w-16 aspect-h-9">
+                            <iframe src="https://www.youtube.com/embed/{{ $videoId }}"
+                                    class="w-full h-full rounded-lg"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen></iframe>
+                        </div>
+                    @else
+                        <div class="w-full h-48 bg-gradient-to-r from-blue-900 to-slate-800 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-video text-4xl text-slate-500"></i>
+                            <span class="sr-only">Sin vista previa</span>
+                        </div>
+                    @endif
+                </div>
             </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="text-center">
+            <a href="{{ route('videos.manage.index') }}" class="inline-flex items-center px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Volver al listado de videos
+            </a>
         </div>
     </div>
 @endsection
