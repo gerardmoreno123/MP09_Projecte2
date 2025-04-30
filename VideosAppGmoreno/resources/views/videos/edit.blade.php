@@ -51,11 +51,21 @@
                         <label for="serie_id" class="block text-sm font-medium text-slate-400 mb-2">Serie (opcional)</label>
                         <select name="serie_id" id="serie_id"
                                 class="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white">
-                            <option value="">Sin serie</option>
+                            @if ($video->serie_id)
+                                <option value="{{ $video->serie_id }}">{{ $video->serie->title }}</option>
+                            @else
+                                <option value="">Selecciona una serie</option>
+                            @endif
                             @foreach($series as $serie)
-                                <option value="{{ $serie->id }}" {{ old('serie_id', $video->serie_id) == $serie->id ? 'selected' : '' }}>
-                                    {{ $serie->title }}
-                                </option>
+                                @auth
+                                    <!-- Show only series created by the authenticated user -->
+                                    @if (auth()->user()->name == $serie->user_name)
+                                        <option value="{{ $serie->id }}" {{ old('serie_id') == $serie->id ? 'selected' : '' }}>
+                                            {{ $serie->title }}
+                                        </option>
+
+                                    @endif
+                                @endauth
                             @endforeach
                         </select>
                         @error('serie_id')

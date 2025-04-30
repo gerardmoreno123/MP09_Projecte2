@@ -20,21 +20,22 @@
                            class="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white">
                     <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
                 </div>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">Buscar</button>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg whitespace-nowrap">
+                    Buscar
+                </button>
             </form>
             @auth
                 <a href="{{ route('videos.create') }}"
-                   class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center">
+                   class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center whitespace-nowrap">
                     <i class="fas fa-plus mr-2"></i> Crear Video
                 </a>
             @endauth
             @if(request('search'))
-                <a href="{{ route('videos.index') }}" class="text-blue-400 hover:text-blue-600 mt-2 inline-block">
+                <a href="{{ route('videos.index') }}" class="text-blue-400 hover:text-blue-600 mt-2 md:mt-0 inline-block md:ml-4">
                     <i class="fas fa-times-circle mr-1"></i> Limpiar búsqueda
                 </a>
             @endif
         </div>
-
 
         <!-- Success Message -->
         @if(session('success'))
@@ -53,8 +54,8 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @forelse($videos as $video)
-                    <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg transition-transform duration-300 hover:shadow-xl hover:-translate-y-1">
-                        <a href="{{ route('videos.show', $video->id) }}" class="block">
+                    <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg transition-transform duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full">
+                        <a href="{{ route('videos.show', $video->id) }}" class="block flex-grow">
                             <!-- Video Thumbnail -->
                             <div class="relative aspect-w-16 aspect-h-9">
                                 @php
@@ -81,8 +82,29 @@
                             </div>
 
                             <!-- Video Info -->
-                            <div class="p-4">
-                                <h3 class="text-lg font-semibold text-white mb-2 line-clamp-2">{{ $video->title }}</h3>
+                            <div class="p-4 flex-grow">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h3 class="text-lg font-semibold text-white line-clamp-2 flex-grow">{{ $video->title }}</h3>
+
+                                    <!-- Action Buttons (only for owner or admin) -->
+                                    @auth
+                                        @if(auth()->id() === $video->user_id || auth()->user()->hasRole('super-admin') || auth()->user()->hasRole('video-manager'))
+                                            <div class="flex gap-2 ml-2">
+                                                <a href="{{ route('videos.edit', $video->id) }}"
+                                                   class="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center"
+                                                   title="Editar">
+                                                    <i class="fas fa-edit text-sm"></i>
+                                                </a>
+                                                <a href="{{ route('videos.delete', $video->id) }}"
+                                                   class="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center justify-center"
+                                                   title="Eliminar">
+                                                    <i class="fas fa-trash-alt text-sm"></i>
+                                                </a>
+                                            </div>
+                                        @endif
+                                    @endauth
+                                </div>
+
                                 <p class="text-sm text-slate-400 mb-3 line-clamp-2">{{ $video->description ?? 'No hay descripción disponible.' }}</p>
 
                                 <!-- Metadata -->
@@ -110,24 +132,6 @@
                                 </a>
                             </div>
                         </a>
-
-                        <!-- Action Buttons (only for owner or admin) -->
-                        @auth
-                            @if(auth()->id() === $video->user_id || auth()->user()->hasRole('admin'))
-                                <div class="p-4 pt-0 flex justify-end gap-2">
-                                    <a href="{{ route('videos.edit', $video->id) }}"
-                                       class="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                                       title="Editar">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a href="{{ route('videos.delete', $video->id) }}"
-                                       class="p-2 bg-red-600 hover:bg-red-600 text-white rounded-lg transition-colors"
-                                       title="Eliminar">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </a>
-                                </div>
-                            @endif
-                        @endauth
                     </div>
                 @empty
                     <div class="col-span-full text-center py-12">

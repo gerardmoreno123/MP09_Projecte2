@@ -22,6 +22,7 @@ class ApiMultimediaController extends Controller
 
         return response()->json([
             'data' => [
+                'id' => $multimedia->id,
                 'multimedia' => $multimedia,
                 'user_name' => $multimedia->user ? $multimedia->user->name : null,
             ]

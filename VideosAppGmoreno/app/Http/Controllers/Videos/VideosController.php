@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Videos;
 
+use App\Events\VideoCreated;
 use App\Http\Controllers\Controller;
 use App\Models\Serie;
 use App\Models\Video;
@@ -73,6 +74,9 @@ class VideosController extends Controller
         $videoData['user_id'] = Auth::id();
 
         $newVideo = Video::create($videoData);
+
+        // Disparar el evento de creación de vídeo
+        event(new VideoCreated($newVideo));
 
         // Actualizar previous_id y next_id
         $previousVideo = Video::orderBy('id', 'desc')->skip(1)->first();

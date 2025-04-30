@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Videos;
 
+use App\Events\VideoCreated;
 use App\Http\Controllers\Controller;
 use App\Models\Serie;
 use App\Models\Video;
@@ -66,6 +67,9 @@ class VideosManageController extends Controller
 
         // Crear el nuevo vídeo
         $newVideo = Video::create($videoData);
+
+        // Disparar el evento de creación de vídeo
+        event(new VideoCreated($newVideo));
 
         // Obtener el último vídeo creado (el que estaría justo antes del nuevo)
         $previousVideo = Video::orderBy('id', 'desc')->skip(1)->first();

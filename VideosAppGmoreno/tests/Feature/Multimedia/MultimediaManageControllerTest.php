@@ -46,8 +46,10 @@ class MultimediaManageControllerTest extends TestCase
             ->assertJson([
                 'data' => [
                     'id' => $multimedia->id,
-                    'title' => $multimedia->title,
-                    'user_id' => $this->user->name,
+                    'multimedia' => [
+                        'title' => $multimedia->title,
+                    ],
+                    'user_name' => $this->user->name,
                 ]
             ]);
     }

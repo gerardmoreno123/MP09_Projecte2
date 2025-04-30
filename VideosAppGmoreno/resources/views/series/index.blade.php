@@ -13,35 +13,49 @@
         </div>
 
         <!-- Search and Filter -->
-        <div class="mb-8 bg-slate-800 p-4 rounded-xl shadow-md">
-            <form action="{{ route('series.index') }}" method="GET" class="flex flex-col md:flex-row gap-4">
-                <div class="flex-1 relative">
+        <div class="mb-8 bg-slate-800 p-4 rounded-xl shadow-md flex flex-col md:flex-row gap-4 items-center">
+            <form action="{{ route('series.index') }}" method="GET" class="flex-1 flex gap-4">
+                <div class="relative flex-1">
                     <input type="text" name="search" placeholder="Buscar series..." value="{{ request('search') }}"
                            class="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white">
-                    <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
                 </div>
-                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
                     Buscar
                 </button>
-                @if(request('search'))
-                    <a href="{{ route('series.index') }}" class="px-4 py-2 text-slate-400 hover:text-blue-400 transition-colors flex items-center">
-                        <i class="fas fa-times mr-2"></i> Limpiar
-                    </a>
-                @endif
             </form>
+            @auth
+                <a href="{{ route('series.create') }}"
+                   class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center whitespace-nowrap">
+                    <i class="fas fa-plus mr-2"></i> Crear Serie
+                </a>
+            @endauth
+            @if(request('search'))
+                <a href="{{ route('series.index') }}" class="px-4 py-2 text-slate-400 hover:text-blue-400 transition-colors flex items-center">
+                    <i class="fas fa-times mr-2"></i> Limpiar
+                </a>
+            @endif
         </div>
+
+        <!-- Success Message -->
+        @if(session('success'))
+            <div class="mb-6 bg-green-600 text-white p-4 rounded-lg flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                {{ session('success') }}
+            </div>
+        @endif
 
         <!-- Series Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @foreach($series as $serie)
-                <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                    <a href="{{ route('series.show', $serie->id) }}" class="block">
+                <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full">
+                    <a href="{{ route('series.show', $serie->id) }}" class="block flex-grow">
                         <!-- Serie Thumbnail -->
                         <div class="relative h-48 w-full">
                             @if($serie->image)
                                 <img src="{{ asset('storage/' . $serie->image) }}"
                                      alt="Imagen de la serie {{ $serie->title }}"
-                                     class="w-full max-w-md rounded-lg shadow-lg">
+                                     class="w-full h-full object-cover">
                             @else
                                 <div class="w-full h-full bg-gradient-to-r from-blue-900 to-slate-800 flex items-center justify-center">
                                     <i class="fas fa-photo-film text-4xl text-slate-500"></i>
@@ -51,10 +65,32 @@
 
                         <!-- Serie Info -->
                         <div class="p-6">
-                            <h3 class="text-xl font-bold text-white mb-2">{{ $serie->title }}</h3>
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-xl font-bold text-white mb-2 flex-grow">{{ $serie->title }}</h3>
+
+                                <!-- Action Buttons (only for owner or specific roles) -->
+                                @auth
+                                    @if(auth()->user()->name === $serie->user_name || auth()->user()->hasRole('super-admin') || auth()->user()->hasRole('serie-manager'))
+                                        <div class="flex gap-2 ml-2">
+                                            <a href="{{ route('series.edit', $serie->id) }}"
+                                               class="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center"
+                                               title="Editar">
+                                                <i class="fas fa-edit text-sm"></i>
+                                            </a>
+                                            <a href="{{ route('series.delete', $serie->id) }}"
+                                               class="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center justify-center"
+                                               title="Eliminar">
+                                                <i class="fas fa-trash-alt text-sm"></i>
+                                            </a>
+                                        </div>
+                                    @endif
+                                @endauth
+                            </div>
+
                             @if($serie->description)
                                 <p class="text-slate-400 text-sm line-clamp-2">{{ $serie->description }}</p>
                             @endif
+
                             <!-- Author Info -->
                             <div class="flex items-center mt-3 space-x-2">
                                 @if($serie->user_photo_url)
@@ -68,7 +104,9 @@
                                 @endif
                                 <span class="text-xs text-slate-400">{{ $serie->user_name }}</span>
                             </div>
-                            <div class="flex items-center mt-3 space-x-2">
+
+                            <!-- Video Count -->
+                            <div class="mt-3">
                                 <span class="bg-blue-600 bg-opacity-90 text-white px-3 py-1 rounded-full text-sm font-medium">
                                     {{ $serie->videos_count }} videos
                                 </span>
@@ -99,7 +137,7 @@
         <!-- Pagination -->
         @if($series->hasPages())
             <div class="mt-10 flex justify-center">
-                {{ $series->links() }}
+                {{ $series->links('pagination::tailwind') }}
             </div>
         @endif
     </div>

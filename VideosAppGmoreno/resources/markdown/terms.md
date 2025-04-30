@@ -234,3 +234,74 @@ Aquest projecte és una plataforma per gestionar i visualitzar vídeos, on els u
     - Afegits enllaços de navegació al **navbar** per accedir a sèries i vídeos, visibles només per a usuaris loguejats.
 
 --- 
+
+## Sprint 7: Sistema de Notificacions per a la Creació de Vídeos
+
+### Correcció d'errors i ajustos segons requisits
+
+- Revisió de l'enunciat per identificar requisits no complerts.
+- Ajustada la lògica de notificacions per complir estrictament els requisits.
+
+### Creació de l'esdeveniment `VideoCreated`
+
+- Implementat a `app/Events/VideoCreated.php` amb suport per notificacions en temps real via **Pusher**.
+- Afegits mètodes:
+    - `__construct($video)`
+    - `broadcastOn()` → canal: `video-created-channel.{user_id}`
+    - `broadcastAs()` → `video.created`
+    - `broadcastWith()` → dades: `video_id`, `video_title`, `message`, `timestamp`.
+
+### Creació del listener `SendVideoCreatedNotification`
+
+- Implementat a `app/Listeners/SendVideoCreatedNotification.php` amb `handle(VideoCreated $event)`.
+- Envia correus als usuaris amb `super_admin = true` via **Mailtrap**.
+- Gestiona errors amb `try-catch` i registra logs a `storage/logs/laravel.log`.
+- Configurat amb cues utilitzant `ShouldQueue` i `QUEUE_CONNECTION=database`.
+
+### Registre de l'esdeveniment al `EventServiceProvider`
+
+- Afegida l'associació `VideoCreated → SendVideoCreatedNotification` al `$listen` de `app/Providers/EventServiceProvider.php`.
+
+### Disparació de l'esdeveniment al controlador
+
+- Modificat `VideosController::store` per disparar l'esdeveniment `VideoCreated` després de crear un vídeo.
+- Afegit registre al log amb:
+
+```php
+Log::info('Disparant event VideoCreated', ['video_title' => $newVideo->title]);
+```
+
+### Configuració de serveis externs
+
+- Configurat **Pusher** a `.env` i `config/broadcasting.php`.
+- Configurat **Mailtrap** a `.env` per a l'enviament de correus.
+- Instal·lats els paquets `laravel-echo` i `pusher-js` via `npm`.
+
+### Creació de la vista de notificacions
+
+- Creada la vista `resources/views/notifications.blade.php` per mostrar notificacions en temps real.
+- Afegit disseny amb llista d'activitat recent, protegida amb middleware `auth`.
+
+### Configuració del frontend per a notificacions
+
+- Modificat `resources/js/app.js` per escoltar `video.created` al canal `video-created-channel.{user_id}` amb Laravel Echo.
+- Afegida funció `addNotificationToDOM` per inserir notificacions automàticament al DOM.
+
+### Autenticació de canals de transmissió
+
+- Configurat `routes/channels.php` per autenticar l'accés al canal `video-created-channel.{user_id}`.
+
+### Proves i depuració
+
+- Verificat que:
+    - Les notificacions arriben correctament al frontend.
+    - Els correus es reben pels administradors.
+- Revisats:
+    - Els logs del backend a `storage/logs/laravel.log`.
+    - La consola del navegador per errors de frontend.
+
+### Configurat el worker de cues amb:
+
+```bash
+php artisan queue:work
+```
