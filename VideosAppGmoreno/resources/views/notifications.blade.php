@@ -24,7 +24,26 @@
 
             <!-- Notifications List -->
             <div id="notifications-list" class="divide-y divide-slate-700">
-                <!-- Las notificaciones se añadirán dinámicamente aquí -->
+                @foreach ($notifications as $notification)
+                    <div class="p-4 hover:bg-slate-750 transition-colors duration-200" data-video-id="{{ $notification->video_id }}">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-emerald-500/20 p-2 rounded-lg">
+                                <i class="fas fa-check-circle text-emerald-500 text-xl"></i>
+                            </div>
+                            <div class="ml-4 flex-1">
+                                <div class="flex items-center justify-between">
+                                    <p class="font-medium text-white">{{ $notification->message }}</p>
+                                    <span class="text-xs text-slate-400">{{ $notification->created_at->format('d/m/Y H:i') }}</span>
+                                </div>
+                                <div class="mt-2 flex space-x-2">
+                                    <a href="{{ route('videos.show', $notification->video_id) }}" class="text-sm px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded-lg text-white">
+                                        Ver video
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>
