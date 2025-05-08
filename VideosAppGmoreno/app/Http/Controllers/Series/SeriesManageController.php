@@ -117,7 +117,7 @@ class SeriesManageController extends Controller
         if ($serie->videos()->count() > 0) {
             $videos = $serie->videos()->get();
             foreach ($videos as $video) {
-                $video->user_id = null;
+                $video->serie_id = null;
                 $video->save();
             }
         }

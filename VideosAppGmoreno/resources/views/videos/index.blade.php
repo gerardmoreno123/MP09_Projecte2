@@ -2,6 +2,22 @@
 
 @section('content')
     <div class="container mx-auto px-4 py-12">
+        <!-- Notifications Container -->
+        <div id="notifications" class="fixed bottom-4 right-4 z-50">
+            @if(session('success'))
+                <div class="notification success show">
+                    <span>{{ session('success') }}</span>
+                    <i class="fas fa-times close-btn"></i>
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="notification error show">
+                    <span>{{ session('error') }}</span>
+                    <i class="fas fa-times close-btn"></i>
+                </div>
+            @endif
+        </div>
+
         <!-- Hero Section -->
         <div class="text-center mb-16">
             <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-4">
@@ -20,13 +36,12 @@
                            class="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white">
                     <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
                 </div>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg whitespace-nowrap">
+                <button type="submit" class="btn btn-primary">
                     Buscar
                 </button>
             </form>
             @auth
-                <a href="{{ route('videos.create') }}"
-                   class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg flex items-center whitespace-nowrap">
+                <a href="{{ route('videos.create') }}" class="btn btn-secondary">
                     <i class="fas fa-plus mr-2"></i> Crear Video
                 </a>
             @endauth
@@ -37,24 +52,11 @@
             @endif
         </div>
 
-        <!-- Success Message -->
-        @if(session('success'))
-            <div class="mb-6 bg-green-600 text-white p-4 rounded-lg flex items-center">
-                <i class="fas fa-check-circle mr-2"></i>
-                {{ session('success') }}
-            </div>
-        @endif
-
         <!-- Video Grid -->
         <div class="mb-12">
-            <h2 class="text-3xl font-bold text-white mb-8 flex items-center">
-                <i class="fas fa-fire text-orange-500 mr-3"></i>
-                Todos los Videos
-            </h2>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @forelse($videos as $video)
-                    <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg transition-transform duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full">
+                    <div class="bg-slate-800 rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col h-full">
                         <a href="{{ route('videos.show', $video->id) }}" class="block flex-grow">
                             <!-- Video Thumbnail -->
                             <div class="relative aspect-w-16 aspect-h-9">
@@ -65,11 +67,11 @@
 
                                 @if($videoId)
                                     <img src="https://img.youtube.com/vi/{{ $videoId }}/hqdefault.jpg"
-                                         alt="{{ $video->title }}"
+                                         alt="Miniatura del vídeo {{ $video->title }}"
                                          class="w-full h-full object-cover transition-opacity duration-300 hover:opacity-90">
                                 @else
                                     <img src="https://placehold.co/640x360?text=Video"
-                                         alt="Default Thumbnail"
+                                         alt="Miniatura por defecto"
                                          class="w-full h-full object-cover transition-opacity duration-300 hover:opacity-90">
                                 @endif
 
@@ -82,21 +84,21 @@
                             </div>
 
                             <!-- Video Info -->
-                            <div class="p-4 flex-grow">
+                            <div class="p-5 flex-grow">
                                 <div class="flex justify-between items-start mb-2">
                                     <h3 class="text-lg font-semibold text-white line-clamp-2 flex-grow">{{ $video->title }}</h3>
 
                                     <!-- Action Buttons (only for owner or admin) -->
                                     @auth
-                                        @if(auth()->id() === $video->user_id || auth()->user()->hasRole('super-admin') || auth()->user()->hasRole('video-manager'))
+                                        @if(auth()->user()->name === $video->user_name || auth()->user()->hasRole('super-admin') || auth()->user()->hasRole('video-manager'))
                                             <div class="flex gap-2 ml-2">
                                                 <a href="{{ route('videos.edit', $video->id) }}"
-                                                   class="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center"
+                                                   class="btn btn-primary btn-sm"
                                                    title="Editar">
                                                     <i class="fas fa-edit text-sm"></i>
                                                 </a>
                                                 <a href="{{ route('videos.delete', $video->id) }}"
-                                                   class="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center justify-center"
+                                                   class="btn btn-danger btn-sm"
                                                    title="Eliminar">
                                                     <i class="fas fa-trash-alt text-sm"></i>
                                                 </a>
@@ -134,9 +136,17 @@
                         </a>
                     </div>
                 @empty
-                    <div class="col-span-full text-center py-12">
-                        <i class="fas fa-video-slash text-5xl text-slate-600 mb-4"></i>
-                        <p class="text-lg text-slate-400">No hay videos disponibles en este momento.</p>
+                    <div class="col-span-full bg-slate-800 rounded-xl p-12 text-center">
+                        <i class="fas fa-photo-film text-5xl text-slate-600 mb-4"></i>
+                        <h3 class="text-xl font-medium text-white mb-2">No hay videos disponibles</h3>
+                        <p class="text-slate-400 mb-4">Aún no se han creado videos en la plataforma.</p>
+                        @auth
+                            @if(auth()->user()->hasAnyRole(['video-manager', 'super-admin']))
+                                <a href="{{ route('videos.create') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus mr-2"></i> Crear nuevo video
+                                </a>
+                            @endif
+                        @endauth
                     </div>
                 @endforelse
             </div>
@@ -144,9 +154,119 @@
             <!-- Pagination -->
             @if($videos->hasPages())
                 <div class="mt-8 flex justify-center">
-                    {{ $videos->links('pagination::tailwind') }}
+                    {{ $videos->links('vendor.pagination.custom-tailwind') }}
                 </div>
             @endif
         </div>
     </div>
+
+    <style>
+        /* Button styles (simulating a reusable component) */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-secondary {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #059669;
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 640px) {
+            .btn-sm {
+                padding: 0.25rem 0.75rem;
+            }
+        }
+
+        /* Notification styles */
+        .notification {
+            position: relative;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            color: white;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background-color: #10b981;
+        }
+
+        .notification.error {
+            background-color: #ef4444;
+        }
+
+        .notification .close-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            cursor: pointer;
+        }
+    </style>
+
+    <script>
+        // Notification handling
+        document.addEventListener('DOMContentLoaded', () => {
+            const notifications = document.querySelectorAll('.notification');
+            notifications.forEach(notification => {
+                // Show notification
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 100);
+
+                // Auto-hide after 3 seconds
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+
+                // Close button
+                const closeBtn = notification.querySelector('.close-btn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        notification.classList.remove('show');
+                        setTimeout(() => notification.remove(), 300);
+                    });
+                }
+            });
+        });
+    </script>
 @endsection

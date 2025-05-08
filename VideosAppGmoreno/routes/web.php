@@ -10,7 +10,7 @@ use App\Http\Controllers\Videos\VideosController;
 use App\Http\Controllers\Videos\VideosManageController;
 use Illuminate\Support\Facades\Route;
 
-// Part publica de l'aplicació
+// Part pública de l'aplicació
 
 // Visualització de vídeos
 Route::get('/', [VideosController::class, 'index'])->name('videos.index');
@@ -19,9 +19,8 @@ Route::get('/{video}', [VideosController::class, 'show'])->name('videos.show')->
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    Route::middleware('auth')->group(function () {
-        Route::get('/notifications', [VideoNotificationController::class, 'index'])->name('notifications.index');
-    });
+    // Visualització de notificacions
+    Route::get('/notifications', [VideoNotificationController::class, 'index'])->name('notifications.index');
 
     // Visualització d'usuaris
     Route::get('/users', [UsersController::class, 'index'])->name('users.index');

@@ -118,11 +118,6 @@ class VideosController extends Controller
     {
         $video = Video::findOrFail($id);
 
-        // Verificar que el usuario sea el propietario o administrador
-        if ($video->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
-            abort(403, 'No tienes permiso para editar este video.');
-        }
-
         $series = Serie::all();
         return view('videos.edit', compact('video', 'series'));
     }
@@ -164,11 +159,6 @@ class VideosController extends Controller
     public function delete(int $id): View
     {
         $video = Video::findOrFail($id);
-
-        // Verificar que el usuario sea el propietario o administrador
-        if ($video->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
-            abort(403, 'No tienes permiso para eliminar este video.');
-        }
 
         return view('videos.delete', compact('video'));
     }

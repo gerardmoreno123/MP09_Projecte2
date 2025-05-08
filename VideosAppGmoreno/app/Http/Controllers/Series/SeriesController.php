@@ -137,11 +137,11 @@ class SeriesController extends Controller
     {
         $serie = Serie::findOrFail($serie);
 
-        // Eliminar la imatge anterior si existeix
-        if ($serie->image) {
-            $oldImagePath = public_path('storage/' . $serie->image);
-            if (file_exists($oldImagePath)) {
-                unlink($oldImagePath);
+        if ($serie->videos()->count() > 0) {
+            $videos = $serie->videos()->get();
+            foreach ($videos as $video) {
+                $video->serie_id = null;
+                $video->save();
             }
         }
 
