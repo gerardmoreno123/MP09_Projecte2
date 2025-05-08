@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Series;
 use App\Http\Controllers\Controller;
 use App\Models\Serie;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class SeriesController extends Controller
 {
@@ -32,7 +34,7 @@ class SeriesController extends Controller
      */
     public function show(int $id)
     {
-        $serie = Serie::with('videos')->find($id);
+        $serie = Serie::with('videos')->findOrFail($id);
 
         return view('series.show', compact('serie'));
     }
@@ -50,25 +52,33 @@ class SeriesController extends Controller
      */
     public function store(Request $request)
     {
-        $data = request()->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'image' => 'nullable|image|max:2048|mimes:jpeg,png,jpg,gif',
-            'user_name' => 'required|string|max:255',
-            'user_photo_url' => 'nullable|url',
-            'published_at' => 'nullable|date',
-        ]);
+        try {
+            $data = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'image' => 'nullable|image|max:2048|mimes:jpeg,png,jpg,gif',
+                'user_name' => 'required|string|max:255',
+                'user_photo_url' => 'nullable|url',
+                'published_at' => 'nullable|date',
+            ]);
 
-        // Validar la imatge i guardar-la
-        if (request()->hasFile('image')) {
-            $image = request()->file('image');
-            $imagePath = $image->store('images/series', 'public');
-            $data['image'] = $imagePath;
+            // Set the authenticated user's ID
+            $data['user_id'] = Auth::id();
+
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('images/series', 'public');
+                $data['image'] = $imagePath;
+            }
+
+            $serie = Serie::create($data);
+            $message = "S’ha creat la sèrie “{$serie->title}”!";
+
+            return redirect()->route('series.index')->with('success', $message);
+        } catch (\Exception $e) {
+            $errorMessage = "Error al crear la sèrie: {$e->getMessage()}";
+            return redirect()->route('series.index')->with('error', $errorMessage);
         }
-
-        $serie = Serie::create($data);
-
-        return redirect()->route('series.show', $serie)->with('success', 'Sèrie creada amb èxit.');
     }
 
     /**
@@ -76,7 +86,12 @@ class SeriesController extends Controller
      */
     public function edit(int $id)
     {
-        $serie = Serie::find($id);
+        $serie = Serie::findOrFail($id);
+
+        // Verify user permissions
+        if ($serie->user_id !== Auth::id() && !Auth::user()->hasAnyRole(['super-admin', 'serie-manager'])) {
+            return redirect()->route('series.index')->with('error', 'No tens permís per editar aquesta sèrie.');
+        }
 
         return view('series.edit', compact('serie'));
     }
@@ -84,48 +99,56 @@ class SeriesController extends Controller
     /**
      * Update the specified series in storage.
      */
-    public function update($serie)
+    public function update(Request $request, int $id)
     {
-        $serie = Serie::findOrFail($serie);
+        try {
+            $serie = Serie::findOrFail($id);
 
-        $data = request()->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'image' => 'nullable|image|max:2048|mimes:jpeg,png,jpg,gif',
-            'user_name' => 'required|string|max:255',
-            'user_photo_url' => 'nullable|url',
-            'published_at' => 'nullable|date',
-        ]);
-
-        // Validar la imatge i guardar-la
-        if (request()->hasFile('image')) {
-            $image = request()->file('image');
-            // Eliminar la imatge anterior si existeix
-            if ($serie->image) {
-                $oldImagePath = public_path('storage/' . $serie->image);
-                if (file_exists($oldImagePath)) {
-                    unlink($oldImagePath);
-                }
+            // Verify user permissions
+            if ($serie->user_id !== Auth::id() && !Auth::user()->hasAnyRole(['super-admin', 'serie-manager'])) {
+                throw new \Exception('No tens permís per actualitzar aquesta sèrie.');
             }
 
-            // Guardar la nova imatge
-            $imagePath = $image->store('images/series', 'public');
-            $data['image'] = $imagePath;
+            $data = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'image' => 'nullable|image|max:2048|mimes:jpeg,png,jpg,gif',
+                'user_name' => 'required|string|max:255',
+                'user_photo_url' => 'nullable|url',
+                'published_at' => 'nullable|date',
+            ]);
+
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                // Delete old image if exists
+                if ($serie->image) {
+                    Storage::disk('public')->delete($serie->image);
+                }
+                $imagePath = $request->file('image')->store('images/series', 'public');
+                $data['image'] = $imagePath;
+            }
+
+            $serie->update($data);
+            $message = "S’ha actualitzat la sèrie “{$serie->title}”!";
+
+            return redirect()->route('series.index')->with('success', $message);
+        } catch (\Exception $e) {
+            $errorMessage = "Error al actualitzar la sèrie: {$e->getMessage()}";
+            return redirect()->route('series.index')->with('error', $errorMessage);
         }
-
-        $serie->update($data);
-
-        return redirect()->route('series.show', $serie)->with('success', 'Sèrie actualitzada amb èxit.');
-
-
     }
 
     /**
      * Show the confirmation page for deleting the specified series.
      */
-    public function delete($serie)
+    public function delete(int $id)
     {
-        $serie = Serie::findOrFail($serie);
+        $serie = Serie::findOrFail($id);
+
+        // Verify user permissions
+        if ($serie->user_id !== Auth::id() && !Auth::user()->hasAnyRole(['super-admin', 'serie-manager'])) {
+            return redirect()->route('series.index')->with('error', 'No tens permís per eliminar aquesta sèrie.');
+        }
 
         return view('series.delete', compact('serie'));
     }
@@ -133,20 +156,33 @@ class SeriesController extends Controller
     /**
      * Remove the specified series from storage.
      */
-    public function destroy($serie)
+    public function destroy(int $id)
     {
-        $serie = Serie::findOrFail($serie);
+        try {
+            $serie = Serie::findOrFail($id);
 
-        if ($serie->videos()->count() > 0) {
-            $videos = $serie->videos()->get();
-            foreach ($videos as $video) {
-                $video->serie_id = null;
-                $video->save();
+            // Verify user permissions
+            if ($serie->user_id !== Auth::id() && !Auth::user()->hasAnyRole(['super-admin', 'serie-manager'])) {
+                throw new \Exception('No tens permís per eliminar aquesta sèrie.');
             }
+
+            // Detach videos from the series
+            if ($serie->videos()->count() > 0) {
+                $serie->videos()->update(['serie_id' => null]);
+            }
+
+            $title = $serie->title;
+            // Delete image if exists
+            if ($serie->image) {
+                Storage::disk('public')->delete($serie->image);
+            }
+            $serie->delete();
+            $message = "S’ha eliminat la sèrie “{$title}”!";
+
+            return redirect()->route('series.index')->with('success', $message);
+        } catch (\Exception $e) {
+            $errorMessage = "Error al eliminar la sèrie: {$e->getMessage()}";
+            return redirect()->route('series.index')->with('error', $errorMessage);
         }
-
-        $serie->delete();
-
-        return redirect()->route('series.index')->with('success', 'Sèrie eliminada amb èxit.');
     }
 }

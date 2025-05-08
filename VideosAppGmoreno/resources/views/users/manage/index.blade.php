@@ -12,6 +12,22 @@
 
 @section('admin-content')
     <div class="container mx-auto px-4 py-12">
+        <!-- Notification Messages -->
+        <div id="notifications" class="fixed bottom-4 right-4 z-50">
+            @if(session('success'))
+                <div class="notification success show">
+                    <span>{{ session('success') }}</span>
+                    <i class="fas fa-times close-btn"></i>
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="notification error show">
+                    <span>{{ session('error') }}</span>
+                    <i class="fas fa-times close-btn"></i>
+                </div>
+            @endif
+        </div>
+
         <!-- Header and Tabs -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4">
             <h1 class="text-2xl font-bold text-white">
@@ -285,5 +301,60 @@
             border-color: #3b82f6;
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
         }
+
+        .notification {
+            position: relative;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            color: white;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background-color: #10b981;
+        }
+
+        .notification.error {
+            background-color: #ef4444;
+        }
+
+        .notification .close-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            cursor: pointer;
+        }
     </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const notifications = document.querySelectorAll('.notification');
+            notifications.forEach(notification => {
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 100);
+
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+
+                const closeBtn = notification.querySelector('.close-btn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        notification.classList.remove('show');
+                        setTimeout(() => notification.remove(), 300);
+                    });
+                }
+            });
+        });
+    </script>
 @endsection

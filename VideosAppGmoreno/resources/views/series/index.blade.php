@@ -2,13 +2,29 @@
 
 @section('content')
     <div class="container mx-auto px-4 py-12">
+        <!-- Notifications Container -->
+        <div id="notifications" class="fixed bottom-4 right-4 z-50">
+            @if(session('success'))
+                <div class="notification success show">
+                    <span>{{ session('success') }}</span>
+                    <i class="fas fa-times close-btn"></i>
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="notification error show">
+                    <span>{{ session('error') }}</span>
+                    <i class="fas fa-times close-btn"></i>
+                </div>
+            @endif
+        </div>
+
         <!-- Header Section -->
         <div class="text-center mb-16">
             <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-4">
-                <span class="bg-gradient-to-r from-blue-500 to-emerald-500 bg-clip-text text-transparent">Nuestras Series</span>
+                <span class="bg-gradient-to-r from-blue-500 to-emerald-500 bg-clip-text text-transparent">Les Nostres Sèries</span>
             </h1>
             <p class="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto">
-                Descubre colecciones organizadas de videos sobre tus temas favoritos
+                Descobreix col·leccions organitzades de vídeos sobre els teus temes preferits
             </p>
         </div>
 
@@ -16,23 +32,23 @@
         <div class="mb-8 bg-slate-800 p-4 rounded-xl shadow-md flex flex-col md:flex-row gap-4 items-center">
             <form action="{{ route('series.index') }}" method="GET" class="flex-1 flex gap-4">
                 <div class="relative flex-1">
-                    <input type="text" name="search" placeholder="Buscar series..." value="{{ request('search') }}"
+                    <input type="text" name="search" placeholder="Cercar sèries..." value="{{ request('search') }}"
                            class="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white"
-                           aria-label="Buscar series">
+                           aria-label="Cercar sèries">
                     <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
                 </div>
                 <button type="submit" class="btn btn-primary">
-                    Buscar
+                    Cercar
                 </button>
             </form>
             @auth
                 <a href="{{ route('series.create') }}" class="btn btn-secondary">
-                    <i class="fas fa-plus mr-2"></i> Crear Serie
+                    <i class="fas fa-plus mr-2"></i> Crear Sèrie
                 </a>
             @endauth
             @if(request('search'))
                 <a href="{{ route('series.index') }}" class="text-blue-400 hover:text-blue-600 mt-2 md:mt-0 inline-block md:ml-4">
-                    <i class="fas fa-times-circle mr-1"></i> Limpiar búsqueda
+                    <i class="fas fa-times-circle mr-1"></i> Netejar cerca
                 </a>
             @endif
         </div>
@@ -46,7 +62,7 @@
                         <div class="relative h-48 w-full">
                             @if($serie->image)
                                 <img src="{{ asset('storage/' . $serie->image) }}"
-                                     alt="Imagen de la serie {{ $serie->title }}"
+                                     alt="Imatge de la sèrie {{ $serie->title }}"
                                      class="w-full h-full object-cover transition-opacity duration-300 hover:opacity-90">
                             @else
                                 <div class="w-full h-full bg-gradient-to-r from-blue-900 to-slate-800 flex items-center justify-center">
@@ -67,13 +83,14 @@
                                         <div class="flex gap-2 ml-2">
                                             <a href="{{ route('series.edit', $serie->id) }}"
                                                class="btn btn-primary btn-sm"
-                                               title="Editar serie"
-                                               aria-label="Editar serie">
+                                               title="Editar sèrie"
+                                               aria-label="Editar sèrie">
                                                 <i class="fas fa-edit text-sm"></i>
                                             </a>
                                             <a href="{{ route('series.delete', $serie->id) }}"
                                                class="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center justify-center"
-                                               title="Eliminar">
+                                               title="Eliminar sèrie"
+                                               aria-label="Eliminar sèrie">
                                                 <i class="fas fa-trash-alt text-sm"></i>
                                             </a>
                                         </div>
@@ -102,7 +119,7 @@
                             <!-- Video Count -->
                             <div>
                                 <span class="bg-blue-600 bg-opacity-90 text-white px-3 py-1 rounded-full text-sm font-medium">
-                                    {{ $serie->videos_count }} videos
+                                    {{ $serie->videos_count }} vídeos
                                 </span>
                             </div>
                         </div>
@@ -111,12 +128,12 @@
             @empty
                 <div class="col-span-full bg-slate-800 rounded-xl p-12 text-center">
                     <i class="fas fa-photo-film text-5xl text-slate-600 mb-4"></i>
-                    <h3 class="text-xl font-medium text-white mb-2">No hay series disponibles</h3>
-                    <p class="text-slate-400 mb-4">Aún no se han creado series en la plataforma.</p>
+                    <h3 class="text-xl font-medium text-white mb-2">No hi ha sèries disponibles</h3>
+                    <p class="text-slate-400 mb-4">Encara no s’han creat sèries a la plataforma.</p>
                     @auth
                         @if(auth()->user()->hasAnyRole(['serie-manager', 'super-admin']))
                             <a href="{{ route('series.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus mr-2"></i> Crear nueva serie
+                                <i class="fas fa-plus mr-2"></i> Crear nova sèrie
                             </a>
                         @endif
                     @endauth
@@ -133,7 +150,7 @@
     </div>
 
     <style>
-        /* Button styles (simulating a reusable component) */
+        /* Button styles */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -180,5 +197,65 @@
                 padding: 0.25rem 0.75rem;
             }
         }
+
+        /* Notification styles */
+        .notification {
+            position: relative;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            color: white;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background-color: #10b981;
+        }
+
+        .notification.error {
+            background-color: #ef4444;
+        }
+
+        .notification .close-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            cursor: pointer;
+        }
     </style>
+
+    <script>
+        // Notification handling
+        document.addEventListener('DOMContentLoaded', () => {
+            const notifications = document.querySelectorAll('.notification');
+            notifications.forEach(notification => {
+                // Show notification
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 100);
+
+                // Auto-hide after 3 seconds
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+
+                // Close button
+                const closeBtn = notification.querySelector('.close-btn');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        notification.classList.remove('show');
+                        setTimeout(() => notification.remove(), 300);
+                    });
+                }
+            });
+        });
+    </script>
 @endsection

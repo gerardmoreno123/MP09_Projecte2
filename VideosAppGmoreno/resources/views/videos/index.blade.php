@@ -21,10 +21,10 @@
         <!-- Hero Section -->
         <div class="text-center mb-16">
             <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-4">
-                <span class="bg-gradient-to-r from-blue-500 to-emerald-500 bg-clip-text text-transparent">Explora los Mejores Videos</span>
+                <span class="bg-gradient-to-r from-blue-500 to-emerald-500 bg-clip-text text-transparent">Explora els Millors Vídeos</span>
             </h1>
             <p class="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto">
-                Descubre, comparte y disfruta de una amplia colección de videos en nuestra plataforma.
+                Descobreix, comparteix i gaudeix d’una àmplia col·lecció de vídeos a la nostra plataforma.
             </p>
         </div>
 
@@ -32,22 +32,22 @@
         <div class="mb-8 bg-slate-800 p-4 rounded-xl shadow-md flex flex-col md:flex-row gap-4 items-center">
             <form action="{{ route('videos.index') }}" method="GET" class="flex-1 flex gap-4">
                 <div class="relative flex-1">
-                    <input type="text" name="search" placeholder="Buscar videos..." value="{{ request('search') }}"
+                    <input type="text" name="search" placeholder="Cercar vídeos..." value="{{ request('search') }}"
                            class="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white">
                     <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
                 </div>
                 <button type="submit" class="btn btn-primary">
-                    Buscar
+                    Cercar
                 </button>
             </form>
             @auth
                 <a href="{{ route('videos.create') }}" class="btn btn-secondary">
-                    <i class="fas fa-plus mr-2"></i> Crear Video
+                    <i class="fas fa-plus mr-2"></i> Crear Vídeo
                 </a>
             @endauth
             @if(request('search'))
                 <a href="{{ route('videos.index') }}" class="text-blue-400 hover:text-blue-600 mt-2 md:mt-0 inline-block md:ml-4">
-                    <i class="fas fa-times-circle mr-1"></i> Limpiar búsqueda
+                    <i class="fas fa-times-circle mr-1"></i> Netejar cerca
                 </a>
             @endif
         </div>
@@ -71,7 +71,7 @@
                                          class="w-full h-full object-cover transition-opacity duration-300 hover:opacity-90">
                                 @else
                                     <img src="https://placehold.co/640x360?text=Video"
-                                         alt="Miniatura por defecto"
+                                         alt="Miniatura per defecte"
                                          class="w-full h-full object-cover transition-opacity duration-300 hover:opacity-90">
                                 @endif
 
@@ -107,7 +107,7 @@
                                     @endauth
                                 </div>
 
-                                <p class="text-sm text-slate-400 mb-3 line-clamp-2">{{ $video->description ?? 'No hay descripción disponible.' }}</p>
+                                <p class="text-sm text-slate-400 mb-3 line-clamp-2">{{ $video->description ?? 'No hi ha descripció disponible.' }}</p>
 
                                 <!-- Metadata -->
                                 <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400 mb-3">
@@ -138,12 +138,12 @@
                 @empty
                     <div class="col-span-full bg-slate-800 rounded-xl p-12 text-center">
                         <i class="fas fa-photo-film text-5xl text-slate-600 mb-4"></i>
-                        <h3 class="text-xl font-medium text-white mb-2">No hay videos disponibles</h3>
-                        <p class="text-slate-400 mb-4">Aún no se han creado videos en la plataforma.</p>
+                        <h3 class="text-xl font-medium text-white mb-2">No hi ha vídeos disponibles</h3>
+                        <p class="text-slate-400 mb-4">Encara no s’han creat vídeos a la plataforma.</p>
                         @auth
                             @if(auth()->user()->hasAnyRole(['video-manager', 'super-admin']))
                                 <a href="{{ route('videos.create') }}" class="btn btn-primary">
-                                    <i class="fas fa-plus mr-2"></i> Crear nuevo video
+                                    <i class="fas fa-plus mr-2"></i> Crear nou vídeo
                                 </a>
                             @endif
                         @endauth
@@ -161,7 +161,7 @@
     </div>
 
     <style>
-        /* Button styles (simulating a reusable component) */
+        /* Button styles */
         .btn {
             display: inline-flex;
             align-items: center;

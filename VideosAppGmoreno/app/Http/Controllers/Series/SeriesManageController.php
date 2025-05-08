@@ -4,128 +4,261 @@ namespace App\Http\Controllers\Series;
 
 use App\Http\Controllers\Controller;
 use App\Models\Serie;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Tests\Feature\Series\SeriesManageControllerTest;
 
 class SeriesManageController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of the series.
+     */
+    public function index(Request $request)
     {
         $query = Serie::query();
 
         // Handle search
-        if (request()->filled('search')) {
-            $search = request()->input('search');
+        if ($request->filled('search')) {
+            $search = $request->input('search');
             $query->where('title', 'like', '%' . $search . '%');
         }
 
         $series = $query->withCount('videos')->paginate(10);
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'data' => $series,
+            ], 200);
+        }
+
         return view('series.manage.index', compact('series'));
     }
 
+    /**
+     * Show the form for creating a new series.
+     */
     public function create()
     {
         return view('series.manage.create');
     }
 
-    public function store()
+    /**
+     * Store a newly created series in storage.
+     */
+    public function store(Request $request)
     {
-        // Lògica per guardar una nova sèrie
-        $data = request()->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'image' => 'nullable|image|max:2048|mimes:jpeg,png,jpg,gif',
-            'user_name' => 'required|string|max:255',
-            'user_photo_url' => 'nullable|url',
-            'published_at' => 'nullable|date',
-        ]);
+        try {
+            $data = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'image' => 'nullable|image|max:2048|mimes:jpeg,png,jpg,gif',
+                'user_name' => 'required|string|max:255',
+                'user_photo_url' => 'nullable|url',
+                'published_at' => 'nullable|date',
+            ]);
 
-        // Validar la imatge i guardar-la
-        if (request()->hasFile('image')) {
-            $image = request()->file('image');
-            $imagePath = $image->store('images/series', 'public');
-            $data['image'] = $imagePath;
+            // Set the authenticated user's ID
+            $data['user_id'] = Auth::id();
+
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('images/series', 'public');
+                $data['image'] = $imagePath;
+            }
+
+            $serie = Serie::create($data);
+            $message = "S’ha creat la sèrie “{$serie->title}”!";
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $message,
+                    'status' => 'success',
+                ], 201);
+            }
+
+            return redirect()->route('series.manage.index')->with('success', $message);
+        } catch (\Exception $e) {
+            $errorMessage = "Error al crear la sèrie: {$e->getMessage()}";
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $errorMessage,
+                    'status' => 'error',
+                ], 500);
+            }
+
+            return redirect()->route('series.manage.index')->with('error', $errorMessage);
         }
-
-        $serie = Serie::create($data);
-
-        return redirect()->route('series.manage.show', $serie)->with('success', 'Sèrie creada amb èxit.');
     }
 
-    public function show($serie)
+    /**
+     * Display the specified series.
+     */
+    public function show($id, Request $request)
     {
-        $serie = Serie::with('videos')->findOrFail($serie);
+        $serie = Serie::with('videos')->findOrFail($id);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'data' => $serie,
+            ], 200);
+        }
 
         return view('series.manage.show', compact('serie'));
     }
 
-    public function edit($serie)
+    /**
+     * Show the form for editing the specified series.
+     */
+    public function edit($id, Request $request)
     {
-        $serie = Serie::findOrFail($serie);
+        $serie = Serie::findOrFail($id);
+
+        // Verify user permissions
+        if ($serie->user_id !== Auth::id() && !Auth::user()->hasAnyRole(['super-admin', 'serie-manager'])) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'No tens permís per editar aquesta sèrie.',
+                    'status' => 'error',
+                ], 403);
+            }
+            return redirect()->route('series.manage.index')->with('error', 'No tens permís per editar aquesta sèrie.');
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'data' => $serie,
+            ], 200);
+        }
 
         return view('series.manage.edit', compact('serie'));
     }
 
-    public function update($serie)
+    /**
+     * Update the specified series in storage.
+     */
+    public function update(Request $request, $id)
     {
-        // Lògica per actualitzar una sèrie
-        $serie = Serie::findOrFail($serie);
+        try {
+            $serie = Serie::findOrFail($id);
 
-        $data = request()->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'image' => 'nullable|image|max:2048|mimes:jpeg,png,jpg,gif',
-            'user_name' => 'required|string|max:255',
-            'user_photo_url' => 'nullable|url',
-            'published_at' => 'nullable|date',
-        ]);
-
-        // Validar la imatge i guardar-la
-        if (request()->hasFile('image')) {
-            $image = request()->file('image');
-            // Eliminar la imatge anterior si existeix
-            if ($serie->image) {
-                $oldImagePath = public_path('storage/' . $serie->image);
-                if (file_exists($oldImagePath)) {
-                    unlink($oldImagePath);
-                }
+            // Verify user permissions
+            if ($serie->user_id !== Auth::id() && !Auth::user()->hasAnyRole(['super-admin', 'serie-manager'])) {
+                throw new \Exception('No tens permís per actualitzar aquesta sèrie.');
             }
 
-            // Guardar la nova imatge
-            $imagePath = $image->store('images/series', 'public');
-            $data['image'] = $imagePath;
+            $data = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'image' => 'nullable|image|max:2048|mimes:jpeg,png,jpg,gif',
+                'user_name' => 'required|string|max:255',
+                'user_photo_url' => 'nullable|url',
+                'published_at' => 'nullable|date',
+            ]);
+
+            // Handle image upload
+            if ($request->hasFile('image')) {
+                // Delete old image if exists
+                if ($serie->image) {
+                    Storage::disk('public')->delete($serie->image);
+                }
+                $imagePath = $request->file('image')->store('images/series', 'public');
+                $data['image'] = $imagePath;
+            }
+
+            $serie->update($data);
+            $message = "S’ha actualitzat la sèrie “{$serie->title}”!";
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $message,
+                    'status' => 'success',
+                ], 200);
+            }
+
+            return redirect()->route('series.manage.index')->with('success', $message);
+        } catch (\Exception $e) {
+            $errorMessage = "Error al actualitzar la sèrie: {$e->getMessage()}";
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $errorMessage,
+                    'status' => 'error',
+                ], 500);
+            }
+
+            return redirect()->route('series.manage.index')->with('error', $errorMessage);
         }
-
-        $serie->update($data);
-
-        return redirect()->route('series.manage.show', $serie)->with('success', 'Sèrie actualitzada amb èxit.');
     }
 
-    public function delete($serie)
+    /**
+     * Show the confirmation page for deleting the specified series.
+     */
+    public function delete($id, Request $request)
     {
-        // Lògica per mostrar la confirmació d'eliminació d'una sèrie
-        $serie = Serie::findOrFail($serie);
+        $serie = Serie::findOrFail($id);
+
+        // Verify user permissions
+        if ($serie->user_id !== Auth::id() && !Auth::user()->hasAnyRole(['super-admin', 'serie-manager'])) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'No tens permís per eliminar aquesta sèrie.',
+                    'status' => 'error',
+                ], 403);
+            }
+            return redirect()->route('series.manage.index')->with('error', 'No tens permís per eliminar aquesta sèrie.');
+        }
 
         return view('series.manage.delete', compact('serie'));
     }
 
-    public function destroy($serie)
+    /**
+     * Remove the specified series from storage.
+     */
+    public function destroy($id, Request $request)
     {
-        // Lògica per eliminar una sèrie
-        $serie = Serie::findOrFail($serie);
-        // Comprovar si la sèrie té vídeos associats
-        if ($serie->videos()->count() > 0) {
-            $videos = $serie->videos()->get();
-            foreach ($videos as $video) {
-                $video->serie_id = null;
-                $video->save();
+        try {
+            $serie = Serie::findOrFail($id);
+
+            // Verify user permissions
+            if ($serie->user_id !== Auth::id() && !Auth::user()->hasAnyRole(['super-admin', 'serie-manager'])) {
+                throw new \Exception('No tens permís per eliminar aquesta sèrie.');
             }
+
+            // Detach videos from the series
+            if ($serie->videos()->count() > 0) {
+                $serie->videos()->update(['serie_id' => null]);
+            }
+
+            $title = $serie->title;
+            // Delete image if exists
+            if ($serie->image) {
+                Storage::disk('public')->delete($serie->image);
+            }
+            $serie->delete();
+            $message = "S’ha eliminat la sèrie “{$title}”!";
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $message,
+                    'status' => 'success',
+                ], 200);
+            }
+
+            return redirect()->route('series.manage.index')->with('success', $message);
+        } catch (\Exception $e) {
+            $errorMessage = "Error al eliminar la sèrie: {$e->getMessage()}";
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $errorMessage,
+                    'status' => 'error',
+                ], 500);
+            }
+
+            return redirect()->route('series.manage.index')->with('error', $errorMessage);
         }
-
-        $serie->delete();
-
-
-        return redirect()->route('series.manage.index')->with('success', 'Sèrie eliminada amb èxit.');
     }
 
     /**

@@ -60,39 +60,57 @@ class VideosController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'url' => 'required|string|unique:videos,url',
-            'serie_id' => 'nullable|exists:series,id',
-        ]);
+        try {
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'url' => 'required|string|unique:videos,url',
+                'serie_id' => 'nullable|exists:series,id',
+            ]);
 
-        $videoData = $request->all();
-        $videoData['published_at'] = now();
-        $videoData['previous_id'] = null;
-        $videoData['next_id'] = null;
-        $videoData['user_id'] = Auth::id();
+            $videoData = $request->all();
+            $videoData['published_at'] = now();
+            $videoData['previous_id'] = null;
+            $videoData['next_id'] = null;
+            $videoData['user_id'] = Auth::id();
 
-        $newVideo = Video::create($videoData);
+            $newVideo = Video::create($videoData);
 
-        // Disparar el evento de creación de vídeo
-        event(new VideoCreated($newVideo));
+            // Fire the video created event
+            event(new VideoCreated($newVideo));
 
-        // Actualizar previous_id y next_id
-        $previousVideo = Video::orderBy('id', 'desc')->skip(1)->first();
-        if ($previousVideo) {
-            $newVideo->update(['previous_id' => $previousVideo->id]);
-            $previousVideo->update(['next_id' => $newVideo->id]);
+            // Update previous_id and next_id
+            $previousVideo = Video::orderBy('id', 'desc')->skip(1)->first();
+            if ($previousVideo) {
+                $newVideo->update(['previous_id' => $previousVideo->id]);
+                $previousVideo->update(['next_id' => $newVideo->id]);
+            }
+
+            $message = "S’ha creat el vídeo “{$newVideo->title}”!";
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $message,
+                    'data' => $newVideo,
+                    'status' => 'success',
+                ], 201);
+            }
+
+            // Flash the message to the session for display on index
+            return redirect()->route('videos.index')->with('success', $message);
+        } catch (\Exception $e) {
+            $errorMessage = "Error al crear el vídeo: {$e->getMessage()}";
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $errorMessage,
+                    'status' => 'error',
+                ], 500);
+            }
+
+            // Flash the error message to the session for display on index
+            return redirect()->route('videos.index')->with('error', $errorMessage);
         }
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => 'Video created successfully.',
-                'data' => $newVideo,
-            ], 201);
-        }
-
-        return redirect()->route('videos.index')->with('success', '¡Video creado con éxito!');
     }
 
     /**
@@ -127,30 +145,47 @@ class VideosController extends Controller
      */
     public function update(Request $request, int $id)
     {
-        $video = Video::findOrFail($id);
+        try {
+            $video = Video::findOrFail($id);
 
-        // Verificar que el usuario sea el propietario o administrador
-        if ($video->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
-            abort(403, 'No tienes permiso para actualizar este video.');
+            // Verify user permissions
+            if ($video->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
+                throw new \Exception('No tens permís per actualitzar aquest vídeo.');
+            }
+
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'url' => 'required|string|unique:videos,url,'.$id,
+                'serie_id' => 'nullable|exists:series,id',
+            ]);
+
+            $video->update($request->all());
+            $message = "S’ha actualitzat el vídeo “{$video->title}”!";
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $message,
+                    'data' => $video,
+                    'status' => 'success',
+                ], 200);
+            }
+
+            // Flash the message to the session for display on index
+            return redirect()->route('videos.index')->with('success', $message);
+        } catch (\Exception $e) {
+            $errorMessage = "Error al actualitzar el vídeo: {$e->getMessage()}";
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $errorMessage,
+                    'status' => 'error',
+                ], 500);
+            }
+
+            // Flash the error message to the session for display on index
+            return redirect()->route('videos.index')->with('error', $errorMessage);
         }
-
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'url' => 'required|string|unique:videos,url,'.$id,
-            'serie_id' => 'nullable|exists:series,id',
-        ]);
-
-        $video->update($request->all());
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => 'Video updated successfully.',
-                'data' => $video,
-            ], 200);
-        }
-
-        return redirect()->route('videos.index')->with('success', '¡Video actualizado con éxito!');
     }
 
     /**
@@ -168,22 +203,40 @@ class VideosController extends Controller
      */
     public function destroy(int $id, Request $request)
     {
-        $video = Video::findOrFail($id);
+        try {
+            $video = Video::findOrFail($id);
 
-        // Verificar que el usuario sea el propietario o administrador
-        if ($video->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
-            abort(403, 'No tienes permiso para eliminar este video.');
+            // Verify user permissions
+            if ($video->user_id !== Auth::id() && !Auth::user()->hasRole('admin')) {
+                throw new \Exception('No tens permís per eliminar aquest vídeo.');
+            }
+
+            $title = $video->title;
+            $video->forceDelete();
+            $message = "S’ha eliminat el vídeo “{$title}”!";
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $message,
+                    'status' => 'success',
+                ], 200);
+            }
+
+            // Flash the message to the session for display on index
+            return redirect()->route('videos.index')->with('success', $message);
+        } catch (\Exception $e) {
+            $errorMessage = "Error al eliminar el vídeo: {$e->getMessage()}";
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => $errorMessage,
+                    'status' => 'error',
+                ], 500);
+            }
+
+            // Flash the error message to the session for display on index
+            return redirect()->route('videos.index')->with('error', $errorMessage);
         }
-
-        $video->forceDelete();
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => 'Video permanently deleted.',
-            ], 204);
-        }
-
-        return redirect()->route('videos.index')->with('success', '¡Video eliminado con éxito!');
     }
 
     /**

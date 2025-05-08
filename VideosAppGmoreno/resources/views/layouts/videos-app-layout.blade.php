@@ -239,7 +239,7 @@
 </main>
 
 <!-- Footer -->
-<footer class="bg-gradient-to-r from-slate-900 to-slate-800 py-6 border-t border-slate-700 sticky z-50">
+<footer class="bg-gradient-to-r from-slate-900 to-slate-800 py-6 border-t border-slate-700 sticky z-40">
     <div class="container mx-auto px-4">
         <div class="flex flex-col md:flex-row justify-between items-center">
             <div class="mb-4 md:mb-0">
